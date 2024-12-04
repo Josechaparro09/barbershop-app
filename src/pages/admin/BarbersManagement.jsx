@@ -3,6 +3,7 @@ import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/fire
 import { db } from '../../firebase/config';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { FiCheckCircle, FiXCircle, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 
 const BarbersManagement = () => {
   const { user } = useAuth();
@@ -37,109 +38,7 @@ const BarbersManagement = () => {
       setLoading(false);
     }
   };
-const handleActivation = async (barberId, action) => {
-    try {
-      const barberRef = doc(db, "users", barberId);
-      const updateData = {
-        status: action ? 'active' : 'pending',
-        isApproved: action,
-        updatedAt: new Date().toISOString(),
-        updatedBy: user.uid
-      };
 
-      if (action) {
-        updateData.approvedAt = new Date().toISOString();
-        updateData.approvedBy = user.uid;
-      }
-
-      await updateDoc(barberRef, updateData);
-      
-      setBarbers(barbers.map(barber => 
-        barber.id === barberId 
-          ? { 
-              ...barber, 
-              status: action ? 'active' : 'pending',
-              isApproved: action,
-              approvedAt: action ? new Date().toISOString() : null
-            }
-          : barber
-      ));
-      
-      toast.success(`Barbero ${action ? 'activado' : 'desactivado'} exitosamente`);
-    } catch (error) {
-      console.error("Error updating barber status:", error);
-      toast.error("Error al actualizar el estado del barbero");
-    }
-  };
-
-  const handleToggleStatus = async (barberId, currentStatus) => {
-    try {
-      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-      const barberRef = doc(db, "users", barberId);
-      
-      await updateDoc(barberRef, {
-        status: newStatus,
-        updatedAt: new Date().toISOString(),
-        updatedBy: user.uid
-      });
-      
-      setBarbers(barbers.map(barber => 
-        barber.id === barberId 
-          ? { 
-              ...barber, 
-              status: newStatus,
-              updatedAt: new Date().toISOString(),
-              updatedBy: user.uid
-            }
-          : barber
-      ));
-      
-      toast.success(`Barbero ${newStatus === 'active' ? 'activado' : 'desactivado'} exitosamente`);
-    } catch (error) {
-      console.error("Error updating barber status:", error);
-      toast.error("Error al actualizar el estado del barbero");
-    }
-  };
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'active':
-        return 'Activo';
-      case 'inactive':
-        return 'Inactivo';
-      default:
-        return status;
-    }
-  };
-  // Función para manejar la aprobación inicial
-  const handleApproval = async (barberId, approve) => {
-    try {
-      const barberRef = doc(db, "users", barberId);
-      await updateDoc(barberRef, {
-        status: approve ? 'active' : 'rejected',
-        approvedAt: approve ? new Date().toISOString() : null,
-        approvedBy: approve ? user.uid : null,
-        updatedAt: new Date().toISOString()
-      });
-
-      setBarbers(barbers.map(barber => 
-        barber.id === barberId 
-          ? { 
-              ...barber, 
-              status: approve ? 'active' : 'rejected',
-              approvedAt: approve ? new Date().toISOString() : null 
-            }
-          : barber
-      ));
-
-      toast.success(`Barbero ${approve ? 'aprobado' : 'rechazado'} exitosamente`);
-    } catch (error) {
-      console.error("Error updating barber approval:", error);
-      toast.error("Error al actualizar el estado del barbero");
-    }
-  };
-
-  // Función para cambiar el estado activo/inactivo
   const handleToggleActive = async (barberId, currentStatus) => {
     try {
       const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -200,14 +99,14 @@ const handleActivation = async (barberId, action) => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Barberos</h1>
-          <p className="text-gray-600">Barbería: {user?.shopName}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Gestión de Barberos</h1>
+          <p className="text-gray-600 text-sm sm:text-base">Barbería: {user?.shopName}</p>
         </div>
         <div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
           >
             <option value="all">Todos</option>
             <option value="pending">Pendientes</option>
@@ -218,84 +117,75 @@ const handleActivation = async (barberId, action) => {
         </div>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nombre
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Teléfono
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Estado
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredBarbers.length === 0 ? (
+      <div className="grid gap-4 sm:hidden">
+        {filteredBarbers.length === 0 ? (
+          <p className="text-center text-gray-500">No hay barberos {filter !== 'all' ? `en estado ${translateStatus(filter)}` : 'registrados'}</p>
+        ) : (
+          filteredBarbers.map((barber) => (
+            <div key={barber.id} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">{barber.name}</h2>
+                  <p className="text-gray-500">{barber.email}</p>
+                  <p className="text-gray-500">{barber.phone}</p>
+                  <span className={`inline-block mt-2 px-2 py-1 text-xs rounded-full ${getStatusBadge(barber.status)}`}>
+                    {translateStatus(barber.status)}
+                  </span>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleToggleActive(barber.id, barber.status)}
+                    className={`p-2 rounded-full ${barber.status === 'active' ? 'text-red-600' : 'text-green-600'} hover:bg-gray-100 transition`}
+                  >
+                    {barber.status === 'active' ? <FiToggleLeft size={20} /> : <FiToggleRight size={20} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="hidden sm:block bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 text-sm">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                  No hay barberos {filter !== 'all' ? `en estado ${translateStatus(filter)}` : 'registrados'}
-                </td>
+                <th className="px-4 py-2 text-left">Nombre</th>
+                <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left">Teléfono</th>
+                <th className="px-4 py-2 text-left">Estado</th>
+                <th className="px-4 py-2 text-left">Acciones</th>
               </tr>
-            ) : (
-              filteredBarbers.map((barber) => (
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredBarbers.map((barber) => (
                 <tr key={barber.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{barber.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{barber.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{barber.phone}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(barber.status)}`}>
+                  <td className="px-4 py-2">{barber.name}</td>
+                  <td className="px-4 py-2">{barber.email}</td>
+                  <td className="px-4 py-2">{barber.phone}</td>
+                  <td className="px-4 py-2">
+                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(barber.status)}`}>
                       {translateStatus(barber.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    {barber.status === 'pending' ? (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleApproval(barber.id, true)}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          Aprobar
-                        </button>
-                        <button
-                          onClick={() => handleApproval(barber.id, false)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Rechazar
-                        </button>
-                      </div>
-                    ) : barber.status !== 'rejected' && (
-                      <button
-                        onClick={() => handleToggleActive(barber.id, barber.status)}
-                        className={barber.status === 'active' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}
-                      >
-                        {barber.status === 'active' ? 'Desactivar' : 'Activar'}
-                      </button>
-                    )}
+                  <td className="px-4 py-2 text-right space-x-2">
+                    <button 
+                      onClick={() => handleToggleActive(barber.id, barber.status)}
+                      className="flex items-center text-blue-500 hover:text-blue-600"
+                    >
+                      {barber.status === "active" ? <FiXCircle className="mr-1" /> : <FiCheckCircle className="mr-1" />}
+                      {barber.status === "active" ? 'Desactivar' : 'Activar'}
+                    </button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
 
-export default BarbersManagement;   
+export default BarbersManagement;

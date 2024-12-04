@@ -12,6 +12,8 @@ import HaircutApprovals from '../pages/admin/HaircutApprovals';
 import BarberDashboard from '../pages/barber/Dashboard';
 import NewHaircut from '../pages/barber/NewHaircut';
 import Layout from '../components/layout/Layout';
+import Inventory from '../pages/admin/Inventory';
+
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
@@ -30,6 +32,8 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="/admin/inventory" element={<Inventory />} />
+
       </Routes>
     );
   }

@@ -4,91 +4,83 @@ import { db } from '../../firebase/config';
 import { useAuth } from '../../context/AuthContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const BarberDashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({
-    todayServices: 0,
+    completedServices: 0,
+    pendingServices: 0,
     todayEarnings: 0,
-    weeklyServices: 0,
-    weeklyEarnings: 0
+    pendingEarnings: 0
   });
-  const [loading, setLoading] = useState(true);
   const [recentServices, setRecentServices] = useState([]);
-  const [topServices, setTopServices] = useState([]);
+  const [pendingServices, setPendingServices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBarberData = async () => {
-      try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const lastWeek = new Date(today);
-        lastWeek.setDate(lastWeek.getDate() - 7);
+    if (user?.uid) {
+      fetchServices();
+    }
+  }, [user?.uid]);
 
-        // Obtener servicios de hoy
-        const todayServicesQuery = query(
-          collection(db, "haircuts"),
-          where("barberId", "==", user.uid),
-          where("createdAt", ">=", today.toISOString())
-        );
-        const todayServicesSnapshot = await getDocs(todayServicesQuery);
-        const todayServices = todayServicesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+  const fetchServices = async () => {
+    try {
+      console.log("Fetching services for barber:", user.uid);
+      
+      // Obtener servicios pendientes
+      const pendingRef = query(
+        collection(db, "haircuts"),
+        where("barberId", "==", user.uid),
+        where("status", "==", "pending")
+      );
+      
+      // Obtener servicios aprobados
+      const approvedRef = query(
+        collection(db, "haircuts"),
+        where("barberId", "==", user.uid),
+        where("status", "==", "completed")
+      );
 
-        // Obtener servicios de la semana
-        const weeklyServicesQuery = query(
-          collection(db, "haircuts"),
-          where("barberId", "==", user.uid),
-          where("createdAt", ">=", lastWeek.toISOString())
-        );
-        const weeklyServicesSnapshot = await getDocs(weeklyServicesQuery);
-        const weeklyServices = weeklyServicesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+      const [pendingSnapshot, approvedSnapshot] = await Promise.all([
+        getDocs(pendingRef),
+        getDocs(approvedRef)
+      ]);
 
-        // Calcular estadísticas
-        const todayEarnings = todayServices.reduce((sum, service) => sum + service.price, 0);
-        const weeklyEarnings = weeklyServices.reduce((sum, service) => sum + service.price, 0);
+      // Procesar servicios pendientes
+      const pendingData = pendingSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      console.log("Servicios pendientes encontrados:", pendingData.length);
+      setPendingServices(pendingData);
 
-        setStats({
-          todayServices: todayServices.length,
-          todayEarnings,
-          weeklyServices: weeklyServices.length,
-          weeklyEarnings
-        });
+      // Procesar servicios aprobados
+      const approvedData = approvedSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      console.log("Servicios aprobados encontrados:", approvedData.length);
+      setRecentServices(approvedData);
 
-        // Obtener servicios recientes
-        const sortedServices = todayServices
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .slice(0, 5);
-        setRecentServices(sortedServices);
+      // Actualizar estadísticas
+      const pendingEarnings = pendingData.reduce((total, service) => total + (service.price || 0), 0);
+      const completedEarnings = approvedData.reduce((total, service) => total + (service.price || 0), 0);
 
-        // Calcular servicios más populares
-        const servicesCount = weeklyServices.reduce((acc, service) => {
-          acc[service.serviceName] = (acc[service.serviceName] || 0) + 1;
-          return acc;
-        }, {});
+      setStats({
+        completedServices: approvedData.length,
+        pendingServices: pendingData.length,
+        todayEarnings: completedEarnings,
+        pendingEarnings: pendingEarnings
+      });
 
-        const topServicesList = Object.entries(servicesCount)
-          .sort(([,a], [,b]) => b - a)
-          .slice(0, 3)
-          .map(([name, count]) => ({ name, count }));
-        
-        setTopServices(topServicesList);
-
-      } catch (error) {
-        console.error("Error fetching barber data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBarberData();
-  }, [user.uid]);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      toast.error("Error al cargar los servicios");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -98,99 +90,90 @@ const BarberDashboard = () => {
     );
   }
 
+  const ServiceList = ({ services, isPending = false }) => (
+    <div className="space-y-4">
+      {services.map(service => (
+        <div 
+          key={service.id}
+          className="bg-white rounded-lg shadow p-4 border-l-4 border-l-indigo-500"
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-medium text-gray-900">{service.serviceName}</h3>
+              <p className="text-sm text-gray-600">Cliente: {service.clientName}</p>
+              <p className="text-sm text-gray-600">
+                Fecha: {format(new Date(service.createdAt), 'dd/MM/yyyy HH:mm', { locale: es })}
+              </p>
+              <p className="text-sm text-gray-600">Precio: ${service.price}</p>
+              {service.paymentMethod && (
+                <p className="text-sm text-gray-600">
+                  Método de pago: {service.paymentMethod}
+                </p>
+              )}
+            </div>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+              isPending 
+                ? 'bg-yellow-100 text-yellow-800' 
+                : 'bg-green-100 text-green-800'
+            }`}>
+              {isPending ? 'Pendiente' : 'Aprobado'}
+            </span>
+          </div>
+        </div>
+      ))}
+      {services.length === 0 && (
+        <p className="text-center text-gray-500 py-4">
+          No hay servicios {isPending ? 'pendientes' : 'aprobados'}
+        </p>
+      )}
+    </div>
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mi Dashboard</h1>
-        <Link
-          to="/barber/new-haircut"
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
-        >
-          Nuevo Servicio
-        </Link>
-      </div>
-      
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Mi Dashboard</h1>
+
       {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Hoy</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Servicios</p>
-              <p className="text-2xl font-bold text-indigo-600">{stats.todayServices}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Ingresos</p>
-              <p className="text-2xl font-bold text-green-600">
-                ${stats.todayEarnings.toFixed(2)}
-              </p>
-            </div>
-          </div>
+          <h3 className="text-sm font-medium text-gray-500">Servicios Aprobados</h3>
+          <p className="mt-2 text-3xl font-bold text-indigo-600">
+            {stats.completedServices}
+          </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Esta Semana</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Servicios</p>
-              <p className="text-2xl font-bold text-indigo-600">{stats.weeklyServices}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Ingresos</p>
-              <p className="text-2xl font-bold text-green-600">
-                ${stats.weeklyEarnings.toFixed(2)}
-              </p>
-            </div>
-          </div>
+          <h3 className="text-sm font-medium text-gray-500">Servicios Pendientes</h3>
+          <p className="mt-2 text-3xl font-bold text-yellow-600">
+            {stats.pendingServices}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-sm font-medium text-gray-500">Ingresos Aprobados</h3>
+          <p className="mt-2 text-3xl font-bold text-green-600">
+            ${stats.todayEarnings.toFixed(2)}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-sm font-medium text-gray-500">Ingresos Pendientes</h3>
+          <p className="mt-2 text-3xl font-bold text-orange-600">
+            ${stats.pendingEarnings.toFixed(2)}
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Servicios Recientes */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Servicios Recientes</h3>
-          <div className="space-y-4">
-            {recentServices.length > 0 ? (
-              recentServices.map((service) => (
-                <div key={service.id} className="flex justify-between items-center border-b pb-2">
-                  <div>
-                    <p className="font-medium text-gray-800">{service.serviceName}</p>
-                    <p className="text-sm text-gray-500">{service.clientName}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-green-600">${service.price.toFixed(2)}</p>
-                    <p className="text-sm text-gray-500">
-                      {format(new Date(service.createdAt), 'HH:mm', { locale: es })}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-gray-500">No hay servicios registrados hoy</p>
-            )}
-          </div>
-        </div>
+      {/* Servicios Pendientes */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Servicios Pendientes de Aprobación</h2>
+        <ServiceList services={pendingServices} isPending={true} />
+      </div>
 
-        {/* Servicios Más Populares */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Servicios Más Populares</h3>
-          <div className="space-y-4">
-            {topServices.length > 0 ? (
-              topServices.map((service, index) => (
-                <div key={index} className="flex justify-between items-center border-b pb-2">
-                  <p className="font-medium text-gray-800">{service.name}</p>
-                  <div className="flex items-center">
-                    <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
-                      {service.count} servicios
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-gray-500">No hay datos suficientes</p>
-            )}
-          </div>
-        </div>
+      {/* Servicios Aprobados */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Servicios Aprobados</h2>
+        <ServiceList services={recentServices} />
       </div>
     </div>
   );

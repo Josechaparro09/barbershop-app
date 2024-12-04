@@ -10,12 +10,15 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuLinks = user?.role === 'admin' ? [
-    { to: '/admin', text: 'Dashboard' },
+    { to: '/admin', text: 'Estadísticas' },
     { to: '/admin/barbers', text: 'Gestionar Barberos' },
     { to: '/admin/services', text: 'Servicios' },
-    { to: '/admin/approvals', text: 'Aprobar Servicios' }
+    { to: '/admin/approvals', text: 'Aprobar Servicios' },
+    { to: '/admin/inventory', text: 'Inventario' }
+
+    
   ] : [
-    { to: '/barber', text: 'Dashboard' },
+    { to: '/barber', text: 'Estadísticas' },
     { to: '/barber/new-haircut', text: 'Nuevo Servicio' },
     { to: '/barber/services', text: 'Mis Servicios' }
   ];
@@ -36,13 +39,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-indigo-600 shadow-lg">
+    <nav className="bg-gradient-to-r from-indigo-600 to-indigo-800 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <span className="text-white font-bold text-xl">Barbershop</span>
+            <Link to="/" className="flex items-center space-x-2">
+              <span className="text-white font-bold text-xl">✂️ StarBarber</span>
             </Link>
           </div>
 
@@ -56,21 +59,38 @@ const Navbar = () => {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
                     ${isCurrentPath(link.to)
                       ? 'bg-indigo-700 text-white'
-                      : 'text-indigo-100 hover:bg-indigo-500'
+                      : 'text-indigo-100 hover:bg-indigo-500 hover:text-white'
                     }`}
                 >
                   {link.text}
                 </Link>
               ))}
               
-              <div className="ml-4 flex items-center space-x-3">
-                <span className="text-white text-sm">{user.name}</span>
+              <div className="relative ml-4 flex items-center space-x-3">
                 <button
-                  onClick={handleLogout}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="flex items-center space-x-1 text-white hover:text-indigo-200 transition-colors"
                 >
-                  Cerrar Sesión
+                  <span className="text-sm">{user.name}</span>
+                  <svg
+                    className={`h-5 w-5 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </button>
+                {isMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 top-full">
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-500 hover:text-white transition-colors"
+                    >
+                      Cerrar Sesión
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -79,40 +99,17 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-indigo-100 hover:bg-indigo-500 focus:outline-none transition-colors"
-              aria-expanded="false"
+              className="inline-flex items-center justify-center p-2 rounded-md text-indigo-100 hover:bg-indigo-500 hover:text-white focus:outline-none transition-colors"
+              aria-expanded={isMenuOpen}
             >
               <span className="sr-only">Abrir menú principal</span>
-              {/* Ícono menú */}
               {isMenuOpen ? (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
             </button>
@@ -130,7 +127,7 @@ const Navbar = () => {
                   className={`block px-3 py-2 rounded-md text-base font-medium transition-colors
                     ${isCurrentPath(link.to)
                       ? 'bg-indigo-700 text-white'
-                      : 'text-indigo-100 hover:bg-indigo-500'
+                      : 'text-indigo-100 hover:bg-indigo-500 hover:text-white'
                     }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -140,9 +137,18 @@ const Navbar = () => {
             </div>
             
             <div className="pt-4 pb-3 border-t border-indigo-500">
-              <div className="px-4">
-                <div className="text-base font-medium text-white">{user.name}</div>
-                <div className="text-sm font-medium text-indigo-200">{user.email}</div>
+              <div className="flex items-center px-5">
+                <div className="flex-shrink-0">
+                  <span className="inline-block h-10 w-10 rounded-full overflow-hidden bg-indigo-100">
+                    <svg className="h-full w-full text-indigo-300" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </span>
+                </div>
+                <div className="ml-3">
+                  <div className="text-base font-medium text-white">{user.name}</div>
+                  <div className="text-sm font-medium text-indigo-200">{user.email}</div>
+                </div>
               </div>
               <div className="mt-3 px-2">
                 <button
@@ -150,7 +156,7 @@ const Navbar = () => {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full px-3 py-2 rounded-md text-base font-medium text-indigo-100 hover:bg-indigo-500 transition-colors text-left"
+                  className="block w-full px-3 py-2 rounded-md text-base font-medium text-indigo-100 hover:bg-indigo-500 hover:text-white transition-colors text-left"
                 >
                   Cerrar Sesión
                 </button>
@@ -164,3 +170,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
