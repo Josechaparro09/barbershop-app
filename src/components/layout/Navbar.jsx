@@ -11,14 +11,13 @@ const Navbar = () => {
 
   const menuLinks = user?.role === 'admin' ? [
     { to: '/admin', text: 'Dashboard' },
-    { to: '/admin/barbers', text: ' Barberos' },
+    { to: '/admin/barbers', text: 'Gestionar Barberos' },
     { to: '/admin/services', text: 'Servicios' },
-    { to: '/admin/reports', text: 'Reportes' }
+    { to: '/admin/approvals', text: 'Aprobar Servicios' }
   ] : [
     { to: '/barber', text: 'Dashboard' },
     { to: '/barber/new-haircut', text: 'Nuevo Servicio' },
-    { to: '/barber/services', text: 'Mis Servicios' },
-    { to: '/barber/profile', text: 'Mi Perfil' }
+    { to: '/barber/services', text: 'Mis Servicios' }
   ];
 
   const handleLogout = async () => {

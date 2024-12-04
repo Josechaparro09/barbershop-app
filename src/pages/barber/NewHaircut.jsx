@@ -102,11 +102,13 @@ const NewHaircut = () => {
         barberName: user.name,
         shopId: user.shopId,
         shopName: user.shopName,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        approvalStatus: 'pending', // Estado pendiente de aprobación
+        status: 'pending'         // Estado del servicio
       };
 
       await addDoc(collection(db, "haircuts"), haircutData);
-      toast.success("Servicio registrado exitosamente");
+      toast.success("Servicio registrado y pendiente de aprobación");
       navigate('/barber');
     } catch (error) {
       console.error("Error al registrar el servicio:", error);
