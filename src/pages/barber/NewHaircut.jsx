@@ -18,51 +18,76 @@ const NewHaircut = () => {
     notes: ''
   });
 
-  // Cargar servicios de la barbería
   useEffect(() => {
-    const fetchServices = async () => {
-      if (!user?.shopId) {
-        toast.error("No se encontró la información de la barbería");
-        return;
-      }
+    if (!user) {
+      console.log('No hay usuario autenticado');
+      return;
+    }
 
-      try {
-        const q = query(
-          collection(db, "services"),
-          where("shopId", "==", user.shopId),
-          where("active", "==", true)
-        );
-        
-        const querySnapshot = await getDocs(q);
-        const servicesData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setServices(servicesData);
-      } catch (error) {
-        console.error("Error al cargar servicios:", error);
-        toast.error("Error al cargar los servicios disponibles");
-      } finally {
-        setLoading(false);
-      }
-    };
+    console.log('Estado del usuario:', {
+      status: user.status,
+      role: user.role,
+      name: user.name
+    });
 
+    // Solo verificar si el status es diferente de 'active'
+    if (user.status !== 'active') {
+      console.log('Usuario no activo:', user.status);
+      toast.error('Tu cuenta no está activa. Contacta al administrador.');
+      navigate('/barber');
+      return;
+    }
+
+    console.log('Usuario activo, procediendo a cargar servicios');
     fetchServices();
-  }, [user?.shopId]);
+  }, [user, navigate]);
+
+  const fetchServices = async () => {
+    if (!user?.shopId) {
+      console.log('No se encontró shopId');
+      toast.error("Error al cargar los servicios");
+      return;
+    }
+
+    try {
+      const q = query(
+        collection(db, "services"),
+        where("shopId", "==", user.shopId)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const servicesData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      console.log('Servicios cargados:', servicesData.length);
+      setServices(servicesData);
+    } catch (error) {
+      console.error("Error al cargar servicios:", error);
+      toast.error("Error al cargar los servicios disponibles");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user?.shopId) {
-      toast.error("Error: No se encontró la información de la barbería");
+
+    if (!user.status === 'active') {
+      toast.error('No tienes autorización para registrar servicios');
+      return;
+    }
+
+    if (!formData.serviceId || !formData.clientName.trim()) {
+      toast.error('Por favor complete todos los campos requeridos');
       return;
     }
 
     setSaving(true);
     try {
-      // Encontrar el servicio seleccionado
       const selectedService = services.find(s => s.id === formData.serviceId);
       if (!selectedService) {
-        toast.error("Por favor selecciona un servicio válido");
+        toast.error("Servicio no válido");
         return;
       }
 
@@ -70,15 +95,14 @@ const NewHaircut = () => {
         serviceId: formData.serviceId,
         serviceName: selectedService.name,
         price: selectedService.price,
-        clientName: formData.clientName,
+        clientName: formData.clientName.trim(),
         paymentMethod: formData.paymentMethod,
-        notes: formData.notes,
+        notes: formData.notes.trim(),
         barberId: user.uid,
         barberName: user.name,
         shopId: user.shopId,
         shopName: user.shopName,
-        createdAt: new Date().toISOString(),
-        status: 'completed'
+        createdAt: new Date().toISOString()
       };
 
       await addDoc(collection(db, "haircuts"), haircutData);
@@ -100,12 +124,32 @@ const NewHaircut = () => {
     );
   }
 
+  if (!user || user.status !== 'active') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Acceso No Autorizado
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Tu cuenta no está activa. Contacta al administrador.
+          </p>
+          <button
+            onClick={() => navigate('/barber')}
+            className="text-indigo-600 hover:text-indigo-800"
+          >
+            Volver al Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Registrar Nuevo Servicio</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-md rounded-lg p-6">
-        {/* Selección de Servicio */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Seleccionar Servicio *
@@ -119,13 +163,12 @@ const NewHaircut = () => {
             <option value="">Selecciona un servicio</option>
             {services.map((service) => (
               <option key={service.id} value={service.id}>
-                {service.name} - ${service.price.toFixed(2)} - {service.duration} min
+                {service.name} - ${service.price} 
               </option>
             ))}
           </select>
         </div>
 
-        {/* Nombre del Cliente */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Nombre del Cliente *
@@ -139,7 +182,6 @@ const NewHaircut = () => {
           />
         </div>
 
-        {/* Método de Pago */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Método de Pago
@@ -155,7 +197,6 @@ const NewHaircut = () => {
           </select>
         </div>
 
-        {/* Notas */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Notas
@@ -169,12 +210,11 @@ const NewHaircut = () => {
           />
         </div>
 
-        {/* Botones */}
         <div className="flex justify-end space-x-3">
           <button
             type="button"
             onClick={() => navigate('/barber')}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
             Cancelar
           </button>
@@ -182,8 +222,7 @@ const NewHaircut = () => {
             type="submit"
             disabled={saving}
             className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-              ${saving ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} 
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+              ${saving ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
             {saving ? 'Guardando...' : 'Registrar Servicio'}
           </button>
@@ -193,4 +232,4 @@ const NewHaircut = () => {
   );
 };
 
-export default NewHaircut;
+export default NewHaircut;  

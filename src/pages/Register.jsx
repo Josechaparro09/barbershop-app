@@ -89,7 +89,9 @@ const Register = () => {
         phone: formData.phone,
         role: formData.role,
         createdAt: new Date().toISOString(),
-        status: 'active',
+        status: formData.role === 'admin' ? 'active' : 'inactive', // Los barberos inician inactivos
+        shopId: formData.role === 'admin' ? uid : formData.shopId,
+        shopName: formData.role === 'admin' ? formData.shopName : formData.shopName,
         uid: uid
       };
 
@@ -98,6 +100,7 @@ const Register = () => {
         userData.shopId = uid; // Usar el UID del admin como shopId
         userData.shopName = formData.shopName;
         userData.isShopOwner = true;
+        userData.status = 'active'; // Admin siempre activo
       } else {
         // Si es barbero, verificar que la barbería existe
         const shopDoc = await getDoc(doc(db, "users", formData.shopId));
@@ -106,12 +109,18 @@ const Register = () => {
         }
         userData.shopId = formData.shopId;
         userData.shopName = formData.shopName;
+        userData.status = 'pending'; // Barbero inicia como pendiente
+        userData.isApproved = false; // Estado de aprobación
       }
 
       // Guardar en Firestore
       await setDoc(doc(db, "users", uid), userData);
       
-      toast.success('Registro exitoso');
+      let message = 'Registro exitoso';
+      if (formData.role === 'barber') {
+        message += '. Tu cuenta está pendiente de aprobación por el administrador de la barbería';
+      }
+      toast.success(message);
       navigate('/login');
     } catch (error) {
       console.error('Error en el registro:', error);
@@ -131,7 +140,7 @@ const Register = () => {
           errorMessage = 'La contraseña es muy débil';
           break;
         default:
-          errorMessage = error.message || 'Error al registrar usuario';
+          errorMessage = error.message;
       }
       
       toast.error(errorMessage);
