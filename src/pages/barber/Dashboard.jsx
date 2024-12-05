@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { useAuth } from '../../context/AuthContext';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useAuth } from "../../context/AuthContext";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { toast } from "react-hot-toast";
+import {
+  FaCheckCircle,
+  FaHourglassHalf,
+  FaDollarSign,
+  FaClipboardList,
+} from "react-icons/fa";
 
 const BarberDashboard = () => {
   const { user } = useAuth();
@@ -12,7 +18,7 @@ const BarberDashboard = () => {
     completedServices: 0,
     pendingServices: 0,
     todayEarnings: 0,
-    pendingEarnings: 0
+    pendingEarnings: 0,
   });
   const [recentServices, setRecentServices] = useState([]);
   const [pendingServices, setPendingServices] = useState([]);
@@ -26,16 +32,12 @@ const BarberDashboard = () => {
 
   const fetchServices = async () => {
     try {
-      console.log("Fetching services for barber:", user.uid);
-      
-      // Obtener servicios pendientes
       const pendingRef = query(
         collection(db, "haircuts"),
         where("barberId", "==", user.uid),
         where("status", "==", "pending")
       );
-      
-      // Obtener servicios aprobados
+
       const approvedRef = query(
         collection(db, "haircuts"),
         where("barberId", "==", user.uid),
@@ -44,36 +46,36 @@ const BarberDashboard = () => {
 
       const [pendingSnapshot, approvedSnapshot] = await Promise.all([
         getDocs(pendingRef),
-        getDocs(approvedRef)
+        getDocs(approvedRef),
       ]);
 
-      // Procesar servicios pendientes
-      const pendingData = pendingSnapshot.docs.map(doc => ({
+      const pendingData = pendingSnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
-      console.log("Servicios pendientes encontrados:", pendingData.length);
       setPendingServices(pendingData);
 
-      // Procesar servicios aprobados
-      const approvedData = approvedSnapshot.docs.map(doc => ({
+      const approvedData = approvedSnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
-      console.log("Servicios aprobados encontrados:", approvedData.length);
       setRecentServices(approvedData);
 
-      // Actualizar estadísticas
-      const pendingEarnings = pendingData.reduce((total, service) => total + (service.price || 0), 0);
-      const completedEarnings = approvedData.reduce((total, service) => total + (service.price || 0), 0);
+      const pendingEarnings = pendingData.reduce(
+        (total, service) => total + (service.price || 0),
+        0
+      );
+      const completedEarnings = approvedData.reduce(
+        (total, service) => total + (service.price || 0),
+        0
+      );
 
       setStats({
         completedServices: approvedData.length,
         pendingServices: pendingData.length,
         todayEarnings: completedEarnings,
-        pendingEarnings: pendingEarnings
+        pendingEarnings: pendingEarnings,
       });
-
     } catch (error) {
       console.error("Error fetching services:", error);
       toast.error("Error al cargar los servicios");
@@ -90,90 +92,111 @@ const BarberDashboard = () => {
     );
   }
 
-  const ServiceList = ({ services, isPending = false }) => (
-    <div className="space-y-4">
-      {services.map(service => (
-        <div 
-          key={service.id}
-          className="bg-white rounded-lg shadow p-4 border-l-4 border-l-indigo-500"
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-medium text-gray-900">{service.serviceName}</h3>
-              <p className="text-sm text-gray-600">Cliente: {service.clientName}</p>
-              <p className="text-sm text-gray-600">
-                Fecha: {format(new Date(service.createdAt), 'dd/MM/yyyy HH:mm', { locale: es })}
-              </p>
-              <p className="text-sm text-gray-600">Precio: ${service.price}</p>
-              {service.paymentMethod && (
-                <p className="text-sm text-gray-600">
-                  Método de pago: {service.paymentMethod}
-                </p>
-              )}
-            </div>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              isPending 
-                ? 'bg-yellow-100 text-yellow-800' 
-                : 'bg-green-100 text-green-800'
-            }`}>
-              {isPending ? 'Pendiente' : 'Aprobado'}
-            </span>
+  const ServiceCard = ({ service, isPending = false }) => (
+    <div className="bg-white border border-[#d4c3b5] rounded-lg p-4 hover:shadow-md transition-all duration-300">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          <div className="mt-1">
+            {isPending ? (
+              <FaHourglassHalf className="text-yellow-500 text-2xl" />
+            ) : (
+              <FaCheckCircle className="text-green-500 text-2xl" />
+            )}
+          </div>
+          <div>
+            <h3 className="font-serif text-[#2c1810] font-medium">{service.serviceName}</h3>
+            <p className="text-sm text-[#8b7355]">Cliente: {service.clientName}</p>
+            <p className="text-sm text-[#8b7355]">
+              {format(new Date(service.createdAt), "dd/MM/yyyy HH:mm", { locale: es })}
+            </p>
           </div>
         </div>
-      ))}
-      {services.length === 0 && (
-        <p className="text-center text-gray-500 py-4">
-          No hay servicios {isPending ? 'pendientes' : 'aprobados'}
-        </p>
-      )}
+        <p className="text-lg font-bold text-[#6b4423]">${service.price}</p>
+      </div>
     </div>
   );
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Mi Dashboard</h1>
+      <div className="bg-[#f8f5f0] p-6 rounded-lg border border-[#d4c3b5] shadow mb-8">
+        <h1 className="text-2xl font-serif text-[#2c1810] text-center mb-6 border-b border-[#d4c3b5] pb-2">
+          Panel de {user.name}
+        </h1>
 
-      {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm font-medium text-gray-500">Servicios Aprobados</h3>
-          <p className="mt-2 text-3xl font-bold text-indigo-600">
-            {stats.completedServices}
-          </p>
-        </div>
+        {/* Estadísticas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
+            <div className="flex items-center gap-3">
+              <FaCheckCircle className="text-[#3c7a3d] text-2xl" />
+              <div>
+                <p className="text-xs text-[#8b7355] font-serif">Servicios Aprobados</p>
+                <p className="text-xl font-bold text-[#2c1810]">{stats.completedServices}</p>
+              </div>
+            </div>
+          </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm font-medium text-gray-500">Servicios Pendientes</h3>
-          <p className="mt-2 text-3xl font-bold text-yellow-600">
-            {stats.pendingServices}
-          </p>
-        </div>
+          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
+            <div className="flex items-center gap-3">
+              <FaHourglassHalf className="text-yellow-500 text-2xl" />
+              <div>
+                <p className="text-xs text-[#8b7355] font-serif">Servicios Pendientes</p>
+                <p className="text-xl font-bold text-[#2c1810]">{stats.pendingServices}</p>
+              </div>
+            </div>
+          </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm font-medium text-gray-500">Ingresos Aprobados</h3>
-          <p className="mt-2 text-3xl font-bold text-green-600">
-            ${stats.todayEarnings.toFixed(2)}
-          </p>
-        </div>
+          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
+            <div className="flex items-center gap-3">
+              <FaDollarSign className="text-[#3c7a3d] text-2xl" />
+              <div>
+                <p className="text-xs text-[#8b7355] font-serif">Ingresos Aprobados</p>
+                <p className="text-xl font-bold text-[#6b4423]">${stats.todayEarnings.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm font-medium text-gray-500">Ingresos Pendientes</h3>
-          <p className="mt-2 text-3xl font-bold text-orange-600">
-            ${stats.pendingEarnings.toFixed(2)}
-          </p>
+          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
+            <div className="flex items-center gap-3">
+              <FaClipboardList className="text-yellow-500 text-2xl" />
+              <div>
+                <p className="text-xs text-[#8b7355] font-serif">Ingresos Pendientes</p>
+                <p className="text-xl font-bold text-[#6b4423]">${stats.pendingEarnings.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Servicios Pendientes */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Servicios Pendientes de Aprobación</h2>
-        <ServiceList services={pendingServices} isPending={true} />
+      <div className="bg-white border border-[#d4c3b5] rounded-lg p-6 mb-6">
+        <h2 className="text-xl font-serif text-[#2c1810] mb-4 pb-2 border-b border-[#d4c3b5]">
+          Servicios Pendientes
+        </h2>
+        <div className="space-y-4">
+          {pendingServices.length === 0 ? (
+            <p className="text-center text-[#8b7355] py-4">No hay servicios pendientes</p>
+          ) : (
+            pendingServices.map((service) => (
+              <ServiceCard key={service.id} service={service} isPending={true} />
+            ))
+          )}
+        </div>
       </div>
 
       {/* Servicios Aprobados */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Servicios Aprobados</h2>
-        <ServiceList services={recentServices} />
+      <div className="bg-white border border-[#d4c3b5] rounded-lg p-6">
+        <h2 className="text-xl font-serif text-[#2c1810] mb-4 pb-2 border-b border-[#d4c3b5]">
+          Servicios Aprobados
+        </h2>
+        <div className="space-y-4">
+          {recentServices.length === 0 ? (
+            <p className="text-center text-[#8b7355] py-4">No hay servicios aprobados</p>
+          ) : (
+            recentServices.map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
