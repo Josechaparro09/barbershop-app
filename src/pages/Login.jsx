@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { toast } from 'react-hot-toast';
+//import barbershop from '../assets/images/barbershop.jpg';
 
 const Login = () => {
   const [formData, setFormData] = useState({
