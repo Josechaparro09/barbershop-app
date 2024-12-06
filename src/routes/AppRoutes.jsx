@@ -1,3 +1,4 @@
+// src/routes/AppRoutes.jsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -20,13 +21,12 @@ import NewHaircut from '../pages/barber/NewHaircut';
 import Profile from '../pages/barber/Profile';
 import Services from '../pages/barber/Services';
 
-// Componentes de layout
+// Componente de layout
 import Layout from '../components/layout/Layout';
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
 
-  // Pantalla de carga mientras se verifica la autenticación
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -35,29 +35,25 @@ const AppRoutes = () => {
     );
   }
 
-  // Si no hay usuario autenticado, mostrar rutas públicas
+  // Rutas públicas si no hay usuario autenticado
   if (!user) {
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
   }
 
-  // Rutas protegidas con layout común
+  // Rutas protegidas para usuarios autenticados
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        {/* Redirección según el rol del usuario */}
-        <Route
-          index
-          element={
-            <Navigate to={user.role === 'admin' ? '/admin' : '/barber'} replace />
-          }
-        />
-
+        <Route index element={
+          <Navigate to={user.role === 'admin' ? '/admin' : '/barber'} />
+        } />
+        
         {/* Rutas de Administrador */}
         {user.role === 'admin' && (
           <>
@@ -79,7 +75,7 @@ const AppRoutes = () => {
           </>
         )}
 
-        {/* Rutas no encontradas */}
+        {/* Ruta 404 */}
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

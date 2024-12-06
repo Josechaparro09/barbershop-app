@@ -1,4 +1,4 @@
-import React from 'react';
+//  src\pages\admin\Reports.jsx
 
 const Reports = () => {
   return (

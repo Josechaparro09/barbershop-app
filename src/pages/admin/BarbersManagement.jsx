@@ -1,3 +1,4 @@
+// src\pages\admin\BarbersManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
