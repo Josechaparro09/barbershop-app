@@ -1,3 +1,4 @@
+// src\pages\admin\HaircutApprovals.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';

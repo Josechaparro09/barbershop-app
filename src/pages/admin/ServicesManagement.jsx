@@ -1,3 +1,4 @@
+// src\pages\admin\ServicesManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/config';

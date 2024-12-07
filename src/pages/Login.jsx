@@ -1,10 +1,12 @@
+// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { toast } from 'react-hot-toast';
-//import barbershop from '../assets/images/barbershop.jpg';
+import { useTheme } from '../context/ThemeContext';
+import { Moon, Sun } from 'lucide-react';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +16,8 @@ const Login = () => {
   
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, logout } = useAuth(); // Agregamos logout del contexto
+  const { login, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,10 +37,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Iniciar sesión con Firebase Auth
       const userCredential = await login(formData.email, formData.password);
-      
-      // Verificar el estado del usuario en Firestore
       const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
       
       if (!userDoc.exists()) {
@@ -48,7 +48,6 @@ const Login = () => {
 
       const userData = userDoc.data();
 
-      // Verificar estado para barberos
       if (userData.role === 'barber') {
         if (userData.status === 'pending') {
           await logout();
@@ -95,17 +94,40 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-10 rounded-xl shadow-2xl relative">
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-5 h-5 text-yellow-500" />
+          ) : (
+            <Moon className="w-5 h-5 text-gray-500" />
+          )}
+        </button>
+
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Iniciar Sesión
+        {theme === 'dark' ? (
+            <img 
+            src="/bb.png" 
+            alt="Barbería" 
+            className="mx-auto h-36"
+          />
+          ) : (
+            <img 
+            src="/bbDark.png" 
+            alt="Barbería" 
+            className="mx-auto h-36"
+          />
+          )}
+          
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+            Iniciar sesión
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            ¿No tienes una cuenta?{' '}
-            <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Regístrate
-            </Link>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Iniciar sesión en tu cuenta
           </p>
         </div>
         
@@ -120,7 +142,11 @@ const Login = () => {
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border 
+                  border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 
+                  text-gray-900 dark:text-white rounded-t-md focus:outline-none 
+                  focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm
+                  dark:bg-gray-700 transition-colors duration-200"
                 placeholder="Correo electrónico"
                 value={formData.email}
                 onChange={handleChange}
@@ -137,7 +163,11 @@ const Login = () => {
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border
+                  border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400
+                  text-gray-900 dark:text-white rounded-b-md focus:outline-none
+                  focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm
+                  dark:bg-gray-700 transition-colors duration-200"
                 placeholder="Contraseña"
                 value={formData.password}
                 onChange={handleChange}
@@ -150,14 +180,15 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white 
-                ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} 
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200`}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent 
+                text-sm font-medium rounded-md text-black bg-yellow-500 hover:bg-yellow-400
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 
+                transition-colors duration-200 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {loading ? (
                 <>
                   <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -170,6 +201,17 @@ const Login = () => {
             </button>
           </div>
         </form>
+        <div className="mt-6">
+          <Link
+            to="/register"
+            className="w-full flex justify-center py-2 px-4 border border-yellow-500 rounded-md 
+              shadow-sm text-sm font-medium text-yellow-500 bg-transparent
+              hover:bg-yellow-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 
+              focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+          >
+            Crear una cuenta
+          </Link>
+        </div>
       </div>
     </div>
   );

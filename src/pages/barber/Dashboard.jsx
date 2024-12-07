@@ -1,19 +1,26 @@
+// src/pages/barber/Dashboard.jsx
 import React, { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "react-hot-toast";
 import {
-  FaCheckCircle,
-  FaHourglassHalf,
-  FaDollarSign,
-  FaClipboardList,
-} from "react-icons/fa";
+  CheckCircle,
+  Clock,
+  DollarSign,
+  ClipboardList,
+  Calendar,
+  TrendingUp,
+  Scissors,
+  User
+} from "lucide-react";
 
 const BarberDashboard = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const [stats, setStats] = useState({
     completedServices: 0,
     pendingServices: 0,
@@ -84,119 +91,176 @@ const BarberDashboard = () => {
     }
   };
 
+  const ServiceList = ({ services, isPending = false }) => {
+    const cardBgColor = theme === 'dark' 
+      ? 'bg-gray-800 hover:bg-gray-700' 
+      : 'bg-white hover:bg-gray-50';
+
+    const textColor = theme === 'dark'
+      ? 'text-gray-300'
+      : 'text-gray-700';
+
+    return (
+      <div className={`rounded-lg shadow-lg overflow-hidden ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      } transition-colors duration-200`}>
+        <div className={`px-6 py-4 border-b ${
+          theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        } flex justify-between items-center`}>
+          <h3 className={`text-lg font-semibold ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
+            {isPending ? "Servicios Pendientes" : "Servicios Completados"}
+          </h3>
+          {isPending ? (
+            <Clock className="text-yellow-500 h-5 w-5" />
+          ) : (
+            <CheckCircle className="text-green-500 h-5 w-5" />
+          )}
+        </div>
+
+        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          {services.length === 0 ? (
+            <div className={`p-6 text-center ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>
+              No hay servicios {isPending ? "pendientes" : "completados"}
+            </div>
+          ) : (
+            services.map((service) => (
+              <div key={service.id} className={`p-4 ${cardBgColor} transition-colors duration-200`}>
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <Scissors className={`h-4 w-4 ${textColor}`} />
+                      <span className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {service.serviceName}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <User className={`h-4 w-4 ${textColor}`} />
+                      <span className={textColor}>
+                        Cliente: {service.clientName}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Calendar className={`h-4 w-4 ${textColor}`} />
+                      <span className={textColor}>
+                        {format(new Date(service.createdAt), "dd/MM/yyyy HH:mm", { locale: es })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`px-3 py-1 rounded-full ${
+                    theme === 'dark' 
+                      ? 'bg-green-900/20 text-green-400' 
+                      : 'bg-green-100 text-green-600'
+                  }`}>
+                    ${service.price?.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className={`flex justify-center items-center min-h-screen ${
+        theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
+      }`}>
+        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${
+          theme === 'dark' ? 'border-white' : 'border-indigo-600'
+        }`} />
       </div>
     );
   }
 
-  const ServiceCard = ({ service, isPending = false }) => (
-    <div className="bg-white border border-[#d4c3b5] rounded-lg p-4 hover:shadow-md transition-all duration-300">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <div className="mt-1">
-            {isPending ? (
-              <FaHourglassHalf className="text-yellow-500 text-2xl" />
-            ) : (
-              <FaCheckCircle className="text-green-500 text-2xl" />
-            )}
-          </div>
-          <div>
-            <h3 className="font-serif text-[#2c1810] font-medium">{service.serviceName}</h3>
-            <p className="text-sm text-[#8b7355]">Cliente: {service.clientName}</p>
-            <p className="text-sm text-[#8b7355]">
-              {format(new Date(service.createdAt), "dd/MM/yyyy HH:mm", { locale: es })}
-            </p>
-          </div>
-        </div>
-        <p className="text-lg font-bold text-[#6b4423]">${service.price}</p>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-[#f8f5f0] p-6 rounded-lg border border-[#d4c3b5] shadow mb-8">
-        <h1 className="text-2xl font-serif text-[#2c1810] text-center mb-6 border-b border-[#d4c3b5] pb-2">
-          Panel de {user.name}
+    <div className="p-6 space-y-6">
+      <div className="mb-8">
+        <h1 className={`text-2xl font-bold mb-2 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>
+          Dashboard de {user.name}
         </h1>
-
-        {/* Estadísticas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
-            <div className="flex items-center gap-3">
-              <FaCheckCircle className="text-[#3c7a3d] text-2xl" />
-              <div>
-                <p className="text-xs text-[#8b7355] font-serif">Servicios Aprobados</p>
-                <p className="text-xl font-bold text-[#2c1810]">{stats.completedServices}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
-            <div className="flex items-center gap-3">
-              <FaHourglassHalf className="text-yellow-500 text-2xl" />
-              <div>
-                <p className="text-xs text-[#8b7355] font-serif">Servicios Pendientes</p>
-                <p className="text-xl font-bold text-[#2c1810]">{stats.pendingServices}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
-            <div className="flex items-center gap-3">
-              <FaDollarSign className="text-[#3c7a3d] text-2xl" />
-              <div>
-                <p className="text-xs text-[#8b7355] font-serif">Ingresos Aprobados</p>
-                <p className="text-xl font-bold text-[#6b4423]">${stats.todayEarnings.toFixed(2)}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg border border-[#d4c3b5] shadow-sm">
-            <div className="flex items-center gap-3">
-              <FaClipboardList className="text-yellow-500 text-2xl" />
-              <div>
-                <p className="text-xs text-[#8b7355] font-serif">Ingresos Pendientes</p>
-                <p className="text-xl font-bold text-[#6b4423]">${stats.pendingEarnings.toFixed(2)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+          {user.shopName}
+        </p>
       </div>
 
-      {/* Servicios Pendientes */}
-      <div className="bg-white border border-[#d4c3b5] rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-serif text-[#2c1810] mb-4 pb-2 border-b border-[#d4c3b5]">
-          Servicios Pendientes
-        </h2>
-        <div className="space-y-4">
-          {pendingServices.length === 0 ? (
-            <p className="text-center text-[#8b7355] py-4">No hay servicios pendientes</p>
-          ) : (
-            pendingServices.map((service) => (
-              <ServiceCard key={service.id} service={service} isPending={true} />
-            ))
-          )}
-        </div>
+      {/* Estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          {
+            title: "Servicios Completados",
+            value: stats.completedServices,
+            icon: CheckCircle,
+            color: "green",
+          },
+          {
+            title: "Servicios Pendientes",
+            value: stats.pendingServices,
+            icon: Clock,
+            color: "yellow",
+          },
+          {
+            title: "Ingresos Totales",
+            value: `$${stats.todayEarnings.toFixed(2)}`,
+            icon: DollarSign,
+            color: "blue",
+          },
+          {
+            title: "Pendiente de Cobro",
+            value: `$${stats.pendingEarnings.toFixed(2)}`,
+            icon: TrendingUp,
+            color: "purple",
+          },
+        ].map((card, index) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={index}
+              className={`rounded-lg shadow-lg p-6 ${
+                theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-50'
+              } transition-all duration-200`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {card.title}
+                  </p>
+                  <p className={`text-2xl font-bold mt-1 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {card.value}
+                  </p>
+                </div>
+                <div className={`p-3 rounded-full bg-opacity-10 ${
+                  card.color === 'green' && (theme === 'dark' ? 'bg-green-400 text-green-400' : 'bg-green-500 text-green-500')
+                } ${
+                  card.color === 'yellow' && (theme === 'dark' ? 'bg-yellow-400 text-yellow-400' : 'bg-yellow-500 text-yellow-500')
+                } ${
+                  card.color === 'blue' && (theme === 'dark' ? 'bg-blue-400 text-blue-400' : 'bg-blue-500 text-blue-500')
+                } ${
+                  card.color === 'purple' && (theme === 'dark' ? 'bg-purple-400 text-purple-400' : 'bg-purple-500 text-purple-500')
+                }`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Servicios Aprobados */}
-      <div className="bg-white border border-[#d4c3b5] rounded-lg p-6">
-        <h2 className="text-xl font-serif text-[#2c1810] mb-4 pb-2 border-b border-[#d4c3b5]">
-          Servicios Aprobados
-        </h2>
-        <div className="space-y-4">
-          {recentServices.length === 0 ? (
-            <p className="text-center text-[#8b7355] py-4">No hay servicios aprobados</p>
-          ) : (
-            recentServices.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))
-          )}
-        </div>
+      {/* Listas de Servicios */}
+      <div className="space-y-6">
+        <ServiceList services={pendingServices} isPending={true} />
+        <ServiceList services={recentServices} isPending={false} />
       </div>
     </div>
   );
