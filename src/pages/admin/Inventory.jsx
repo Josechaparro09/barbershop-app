@@ -336,7 +336,7 @@ const Inventory = () => {
  }}
  className="mt-4 sm:mt-0 bg-white border-2 border-[#d4c3b5] text-[#2c1810] px-6 py-3 rounded-lg 
    hover:bg-[#f8f5f0] transition-all duration-300 flex items-center space-x-2 shadow-md 
-   hover:shadow-lg font-serif group"
+   hover:shadow-lg "
 >
  <span className="bg-[#3c7a3d] text-white p-1 rounded-full group-hover:rotate-90 transition-transform duration-300">
    <FiPlus className="text-lg" />
@@ -352,7 +352,7 @@ const Inventory = () => {
    {/* Ventas Hoy */}
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
-       <p className="text-[#2c1810] text-xs font-serif">Ventas Hoy</p>
+       <p className="text-[#2c1810] text-xs ">Ventas Hoy</p>
        <p className="text-xl font-bold text-[#6b4423]">${stats.todayTotal?.toFixed(2)}</p>
        <p className="text-xs text-[#8b7355]">{stats.todaySales} ventas</p>
      </div>
@@ -361,7 +361,7 @@ const Inventory = () => {
    {/* Ventas Mes */}
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
-       <p className="text-[#2c1810] text-xs font-serif">Ventas Mes</p>
+       <p className="text-[#2c1810] text-xs ">Ventas Mes</p>
        <p className="text-xl font-bold text-[#6b4423]">${stats.monthTotal?.toFixed(2)}</p>
        <p className="text-xs text-[#8b7355]">{stats.monthSales} ventas</p>
      </div>
@@ -370,7 +370,7 @@ const Inventory = () => {
    {/* Ganancias Hoy */}
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
-       <p className="text-[#2c1810] text-xs font-serif">Ganancias Hoy</p>
+       <p className="text-[#2c1810] text-xs ">Ganancias Hoy</p>
        <p className="text-xl font-bold text-[#3c7a3d]">${stats.todayEarnings?.toFixed(2)}</p>
      </div>
    </div>
@@ -378,7 +378,7 @@ const Inventory = () => {
    {/* Ganancias Mes */}
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
-       <p className="text-[#2c1810] text-xs font-serif">Ganancias Mes</p>
+       <p className="text-[#2c1810] text-xs ">Ganancias Mes</p>
        <p className="text-xl font-bold text-[#3c7a3d]">${stats.monthEarnings?.toFixed(2)}</p>
      </div>
    </div>
@@ -387,7 +387,7 @@ const Inventory = () => {
  {/* Top Productos */}
  {stats.topProducts.length > 0 && (
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-4 shadow mt-4">
-     <h3 className="text-[#2c1810] text-sm font-serif mb-2">Top Productos</h3>
+     <h3 className="text-[#2c1810] text-sm  mb-2">Top Productos</h3>
      <div className="space-y-2">
        {stats.topProducts.map((product, index) => (
          <div key={index} className="flex justify-between text-sm border-b border-[#d4c3b5] pb-2">
@@ -447,7 +447,7 @@ const Inventory = () => {
      >
        <div className="flex justify-between items-start mb-2">
          <div>
-           <h3 className="text-lg font-serif text-[#2c1810]">{product.name}</h3>
+           <h3 className="text-lg  text-[#2c1810]">{product.name}</h3>
            <p className="text-[#8b7355] text-sm flex items-center">
              {categories.find(c => c.id === product.category)?.icon}{' '}
              {categories.find(c => c.id === product.category)?.name}
@@ -529,7 +529,7 @@ const Inventory = () => {
 {isModalOpen && (
  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
    <div className="bg-[#f8f5f0] rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto border border-[#d4c3b5]">
-     <h2 className="text-xl font-serif text-[#2c1810] mb-4 text-center border-b border-[#d4c3b5] pb-2">
+     <h2 className="text-xl  text-[#2c1810] mb-4 text-center border-b border-[#d4c3b5] pb-2">
        {selectedProduct ? 'Editar Producto' : 'Nuevo Producto'}
      </h2>
 
@@ -537,7 +537,7 @@ const Inventory = () => {
        {/* Información básica */}
        <div className="bg-white p-4 rounded border border-[#d4c3b5] space-y-4">
          <div>
-           <label className="block text-sm font-serif text-[#2c1810] mb-1">Nombre *</label>
+           <label className="block text-sm  text-[#2c1810] mb-1">Nombre *</label>
            <input
              type="text"
              value={formData.name}
@@ -548,7 +548,7 @@ const Inventory = () => {
          </div>
 
          <div>
-           <label className="block text-sm font-serif text-[#2c1810] mb-1">Categoría *</label>
+           <label className="block text-sm  text-[#2c1810] mb-1">Categoría *</label>
            <select
              value={formData.category}
              onChange={(e) => setFormData({...formData, category: e.target.value})}
@@ -566,10 +566,10 @@ const Inventory = () => {
 
        {/* Precios */}
        <div className="bg-white p-4 rounded border border-[#d4c3b5] space-y-4">
-         <h3 className="font-serif text-[#2c1810] text-sm border-b border-[#d4c3b5] pb-2">Precios</h3>
+         <h3 className=" text-[#2c1810] text-sm border-b border-[#d4c3b5] pb-2">Precios</h3>
          <div className="grid grid-cols-2 gap-4">
            <div>
-             <label className="block text-sm font-serif text-[#2c1810] mb-1">Costo *</label>
+             <label className="block text-sm  text-[#2c1810] mb-1">Costo *</label>
              <div className="relative">
                <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-[#8b7355]">$</span>
                <input
@@ -585,7 +585,7 @@ const Inventory = () => {
            </div>
 
            <div>
-             <label className="block text-sm font-serif text-[#2c1810] mb-1">Precio de Venta *</label>
+             <label className="block text-sm  text-[#2c1810] mb-1">Precio de Venta *</label>
              <div className="relative">
                <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-[#8b7355]">$</span>
                <input
@@ -609,10 +609,10 @@ const Inventory = () => {
 
        {/* Stock */}
        <div className="bg-white p-4 rounded border border-[#d4c3b5] space-y-4">
-         <h3 className="font-serif text-[#2c1810] text-sm border-b border-[#d4c3b5] pb-2">Inventario</h3>
+         <h3 className=" text-[#2c1810] text-sm border-b border-[#d4c3b5] pb-2">Inventario</h3>
          <div className="grid grid-cols-2 gap-4">
            <div>
-             <label className="block text-sm font-serif text-[#2c1810] mb-1">Stock Inicial *</label>
+             <label className="block text-sm  text-[#2c1810] mb-1">Stock Inicial *</label>
              <input
                type="number"
                value={formData.stock}
@@ -624,7 +624,7 @@ const Inventory = () => {
            </div>
 
            <div>
-             <label className="block text-sm font-serif text-[#2c1810] mb-1">Stock Mínimo *</label>
+             <label className="block text-sm  text-[#2c1810] mb-1">Stock Mínimo *</label>
              <input
                type="number"
                value={formData.minStock}
@@ -639,9 +639,9 @@ const Inventory = () => {
 
        {/* Información adicional */}
        <div className="bg-white p-4 rounded border border-[#d4c3b5] space-y-4">
-         <h3 className="font-serif text-[#2c1810] text-sm border-b border-[#d4c3b5] pb-2">Información Adicional</h3>
+         <h3 className=" text-[#2c1810] text-sm border-b border-[#d4c3b5] pb-2">Información Adicional</h3>
          <div>
-           <label className="block text-sm font-serif text-[#2c1810] mb-1">Proveedor</label>
+           <label className="block text-sm  text-[#2c1810] mb-1">Proveedor</label>
            <input
              type="text"
              value={formData.provider}
@@ -652,7 +652,7 @@ const Inventory = () => {
          </div>
 
          <div>
-           <label className="block text-sm font-serif text-[#2c1810] mb-1">Descripción</label>
+           <label className="block text-sm  text-[#2c1810] mb-1">Descripción</label>
            <textarea
              value={formData.description}
              onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -688,19 +688,19 @@ const Inventory = () => {
 {isSellModalOpen && selectedProduct && (
  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
    <div className="bg-[#f8f5f0] rounded-lg p-6 w-full max-w-md border border-[#d4c3b5] shadow-lg">
-     <h2 className="text-xl font-serif text-[#2c1810] mb-4 text-center border-b border-[#d4c3b5] pb-2">Realizar Venta</h2>
+     <h2 className="text-xl  text-[#2c1810] mb-4 text-center border-b border-[#d4c3b5] pb-2">Realizar Venta</h2>
      
      <div className="space-y-4">
        {/* Info del Producto */}
        <div className="bg-white p-3 rounded border border-[#d4c3b5]">
-         <h3 className="font-serif text-[#2c1810]">{selectedProduct.name}</h3>
+         <h3 className=" text-[#2c1810]">{selectedProduct.name}</h3>
          <p className="text-[#8b7355]">Precio: ${selectedProduct.price.toFixed(2)}</p>
          <p className="text-[#8b7355]">Stock: {selectedProduct.stock}</p>
        </div>
 
        {/* Cantidad */}
        <div>
-         <label className="block text-sm font-serif text-[#2c1810] mb-1">Cantidad</label>
+         <label className="block text-sm  text-[#2c1810] mb-1">Cantidad</label>
          <input
            type="number"
            value={sellQuantity}

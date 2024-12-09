@@ -98,7 +98,9 @@ export const themeStyles = {
       shadow: "shadow-lg",
       rounded: "rounded-lg",
       transition: "transition-all duration-200",
-    }
+    },
+    
+    
   };
   
   // Helper function para combinar clases

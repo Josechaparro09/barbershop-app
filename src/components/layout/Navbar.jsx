@@ -22,7 +22,6 @@ const Navbar = () => {
   ] : [
     { to: '/barber', text: 'Estadísticas' },
     { to: '/barber/new-haircut', text: 'Nuevo Servicio' },
-    { to: '/barber/services', text: 'Mis Servicios' }
   ];
 
   const handleLogout = async () => {
