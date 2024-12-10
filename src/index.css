@@ -3,6 +3,26 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Variables para el tema claro */
+  --text-primary: #2c1810;
+  --text-secondary: #8b7355;
+  --text-accent: #6b4423;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f5f0;
+  --border-color: #d4c3b5;
+}
+
+.dark {
+  /* Variables para el tema oscuro */
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --text-accent: #fcd34d;
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --border-color: #374151;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,10 +30,74 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply transition-colors duration-200;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+@layer base {
+  h2 {
+    @apply text-[#2c1810] transition-colors duration-200;
+  }
+
+  .dark h2 {
+    @apply text-gray-100;
+  }
+}
+
+/* Estilos base para tarjetas en tema oscuro */
+.dark .bg-white {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.dark .text-\[\#2c1810\] {
+  color: var(--text-primary);
+}
+
+.dark .text-\[\#8b7355\] {
+  color: var(--text-secondary);
+}
+
+.dark .text-\[\#6b4423\] {
+  color: var(--text-accent);
+}
+
+.dark .border-\[\#d4c3b5\] {
+  border-color: var(--border-color);
+}
+
+.dark .bg-\[\#f8f5f0\] {
+  background-color: var(--bg-secondary);
+}
+
+/* Estilos para inputs en tema oscuro */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: var(--bg-primary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Ajustes para las estadísticas y números */
+.dark .font-bold {
+  color: var(--text-accent);
+}
+
+/* Ajustes para estados de alerta */
+.dark .text-red-500 {
+  @apply text-red-400;
+}
+
+/* Transiciones suaves */
+*,
+*::before,
+*::after {
+  @apply transition-colors duration-200;
 }
