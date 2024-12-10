@@ -4,6 +4,10 @@ import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc } 
 import { db } from '../../firebase/config';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { CurrencyInput } from '../../components/common/MoneyInput';
+import BarcodeScannerModal from '../../components/common/BarcodeScannerModal';
+import QuickSaleButton from '../../components/common/QuickSaleButton';
+import QuickSaleScanner from '../../components/common/QuickSaleScanner';
 import { 
   FiPlus, 
   FiEdit2, 
@@ -13,6 +17,8 @@ import {
   FiAlertCircle,
   FiTrendingUp 
 } from 'react-icons/fi';
+import formatMoney from '../../utils/format';
+import { Barcode } from 'lucide-react';
 
 const categories = [
   { id: 'drinks', name: 'Bebidas', icon: '🥤' },
@@ -33,6 +39,8 @@ const Inventory = () => {
   const [sellQuantity, setSellQuantity] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [barcodeModalOpen, setBarcodeModalOpen] = useState(false);
+  const [scanModalOpen, setScanModalOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -42,7 +50,8 @@ const Inventory = () => {
     stock: '',
     minStock: '',
     provider: '',
-    description: ''
+    description: '',
+    barcode: '',
   });
 
   const [stats, setStats] = useState({
@@ -199,8 +208,21 @@ const Inventory = () => {
         shopId: user.shopId,
         shopName: user.shopName,
         profitMargin: ((formData.price - formData.cost) / formData.price * 100).toFixed(2),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        barcode: formData.barcode.trim()
       };
+      if (productData.barcode) {
+        // Verificar si el código de barras ya existe
+        const barcodeExists = products.some(p => 
+          p.barcode === productData.barcode && 
+          (!selectedProduct || p.id !== selectedProduct.id)
+        );
+        
+        if (barcodeExists) {
+          toast.error("Este código de barras ya está registrado");
+          return;
+        }
+      }
 
       if (selectedProduct) {
         await updateDoc(doc(db, "inventory", selectedProduct.id), productData);
@@ -210,6 +232,7 @@ const Inventory = () => {
         await addDoc(collection(db, "inventory"), productData);
         toast.success("Producto agregado exitosamente");
       }
+      
 
       setFormData({
         name: '',
@@ -352,8 +375,8 @@ const Inventory = () => {
    {/* Ventas Hoy */}
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
-       <p className="text-[#2c1810] text-xs ">Ventas Hoy</p>
-       <p className="text-xl font-bold text-[#6b4423]">${stats.todayTotal?.toFixed(2)}</p>
+       <p className="text-[#6a3521] text-xs ">Ventas Hoy</p>
+       <p className="text-xl font-bold text-[#6b4423]">{formatMoney(stats.todayTotal)}</p>
        <p className="text-xs text-[#8b7355]">{stats.todaySales} ventas</p>
      </div>
    </div>
@@ -362,7 +385,7 @@ const Inventory = () => {
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
        <p className="text-[#2c1810] text-xs ">Ventas Mes</p>
-       <p className="text-xl font-bold text-[#6b4423]">${stats.monthTotal?.toFixed(2)}</p>
+       <p className="text-xl font-bold text-[#6b4423]">{formatMoney(stats.monthTotal)}</p>
        <p className="text-xs text-[#8b7355]">{stats.monthSales} ventas</p>
      </div>
    </div>
@@ -371,7 +394,7 @@ const Inventory = () => {
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
        <p className="text-[#2c1810] text-xs ">Ganancias Hoy</p>
-       <p className="text-xl font-bold text-[#3c7a3d]">${stats.todayEarnings?.toFixed(2)}</p>
+       <p className="text-xl font-bold text-[#3c7a3d]">{formatMoney(stats.todayEarnings)}</p>
      </div>
    </div>
 
@@ -379,7 +402,7 @@ const Inventory = () => {
    <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
        <p className="text-[#2c1810] text-xs ">Ganancias Mes</p>
-       <p className="text-xl font-bold text-[#3c7a3d]">${stats.monthEarnings?.toFixed(2)}</p>
+       <p className="text-xl font-bold text-[#3c7a3d]">{formatMoney(stats.monthEarnings)}</p>
      </div>
    </div>
  </div>
@@ -396,8 +419,8 @@ const Inventory = () => {
              <p className="text-xs text-[#8b7355]">{product.quantity} vendidos</p>
            </div>
            <div className="text-right">
-             <p className="text-[#6b4423]">${product.total?.toFixed(2)}</p>
-             <p className="text-xs text-[#3c7a3d]">+${product.earnings?.toFixed(2)}</p>
+             <p className="text-[#6b4423]">{formatMoney(product.total)}</p>
+             <p className="text-xs text-[#3c7a3d]">+{formatMoney(product.earnings)}</p>
            </div>
          </div>
        ))}
@@ -455,10 +478,10 @@ const Inventory = () => {
          </div>
          <div className="text-right">
            <p className="text-lg font-bold text-[#6b4423]">
-             ${product.price.toFixed(2)}
+             {formatMoney(product.price)}
            </p>
            <p className="text-sm text-[#8b7355]">
-             Costo: ${product.cost?.toFixed(2)}
+             Costo: {formatMoney(product.cost)}
            </p>
          </div>
        </div>
@@ -572,15 +595,12 @@ const Inventory = () => {
              <label className="block text-sm  text-[#2c1810] mb-1">Costo *</label>
              <div className="relative">
                <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-[#8b7355]">$</span>
-               <input
-                 type="number"
-                 value={formData.cost}
-                 onChange={(e) => setFormData({...formData, cost: e.target.value})}
-                 className="w-full pl-6 pr-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]"
-                 required
-                 min="0"
-                 step="0.01"
-               />
+               <CurrencyInput
+                value={formData.cost}
+                onValueChange={(value) => setFormData({...formData, cost: value})}
+                className="w-full pl-6 pr-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]"
+                required
+              />
              </div>
            </div>
 
@@ -588,15 +608,12 @@ const Inventory = () => {
              <label className="block text-sm  text-[#2c1810] mb-1">Precio de Venta *</label>
              <div className="relative">
                <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-[#8b7355]">$</span>
-               <input
-                 type="number"
-                 value={formData.price}
-                 onChange={(e) => setFormData({...formData, price: e.target.value})}
-                 className="w-full pl-6 pr-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]"
-                 required
-                 min="0"
-                 step="0.01"
-               />
+               <CurrencyInput
+                value={formData.price}
+                onValueChange={(value) => setFormData({...formData, price: value})}
+                className="w-full pl-6 pr-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]"
+                required
+              />
              </div>
            </div>
          </div>
@@ -636,6 +653,42 @@ const Inventory = () => {
            </div>
          </div>
        </div>
+
+      {/* Dentro del formulario, después de la sección de información básica */}
+      <div className="bg-white p-4 rounded border border-[#d4c3b5] space-y-4">
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <label className="block text-sm text-[#2c1810] mb-1">Código de Barras</label>
+            <input
+              type="text"
+              value={formData.barcode}
+              onChange={(e) => setFormData({...formData, barcode: e.target.value})}
+              className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]"
+              placeholder="Escanea o ingresa el código"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => setBarcodeModalOpen(true)}
+              className="px-4 py-2 bg-[#3c7a3d] text-white rounded hover:bg-[#2c5a2d] transition-colors"
+            >
+              Escanear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Agregar el modal del escáner */}
+      <BarcodeScannerModal
+        isOpen={barcodeModalOpen}
+        onClose={() => setBarcodeModalOpen(false)}
+        onScan={(result) => {
+          setFormData({...formData, barcode: result});
+          setBarcodeModalOpen(false);
+        }}
+        title="Escanear Código de Barras"
+      />
 
        {/* Información adicional */}
        <div className="bg-white p-4 rounded border border-[#d4c3b5] space-y-4">
@@ -694,9 +747,38 @@ const Inventory = () => {
        {/* Info del Producto */}
        <div className="bg-white p-3 rounded border border-[#d4c3b5]">
          <h3 className=" text-[#2c1810]">{selectedProduct.name}</h3>
-         <p className="text-[#8b7355]">Precio: ${selectedProduct.price.toFixed(2)}</p>
+         <p className="text-[#8b7355]">Precio: {formatMoney(selectedProduct.price)}</p>
          <p className="text-[#8b7355]">Stock: {selectedProduct.stock}</p>
        </div>
+
+      {/* Dentro del modal de venta, antes de la sección de cantidad */}
+      <div className="mb-4">
+        <button
+          onClick={() => setScanModalOpen(true)}
+          className="w-full px-4 py-2 bg-[#3c7a3d] text-white rounded-md hover:bg-[#2c5a2d] transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>Escanear otro producto</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clipRule="evenodd" />
+          </svg>
+        </button>
+      </div>
+
+      <BarcodeScannerModal
+        isOpen={scanModalOpen}
+        onClose={() => setScanModalOpen(false)}
+        onScan={(result) => {
+          const product = products.find(p => p.barcode === result);
+          if (product) {
+            setSelectedProduct(product);
+            setSellQuantity(1);
+            setScanModalOpen(false);
+          } else {
+            toast.error("Producto no encontrado");
+          }
+        }}
+        title="Escanear Producto"
+      />
 
        {/* Cantidad */}
        <div>
@@ -716,15 +798,15 @@ const Inventory = () => {
        <div className="bg-white p-3 rounded border border-[#d4c3b5] space-y-2">
          <div className="flex justify-between text-[#8b7355]">
            <span>Subtotal:</span>
-           <span>${(selectedProduct.price * sellQuantity).toFixed(2)}</span>
+           <span>{formatMoney(selectedProduct.price * sellQuantity)}</span>
          </div>
          <div className="flex justify-between text-[#3c7a3d] text-sm">
            <span>Ganancia:</span>
-           <span>+${((selectedProduct.price - selectedProduct.cost) * sellQuantity).toFixed(2)}</span>
+           <span>+{formatMoney((selectedProduct.price - selectedProduct.cost) * sellQuantity)}</span>
          </div>
          <div className="flex justify-between font-bold text-[#2c1810] pt-2 border-t border-[#d4c3b5]">
            <span>Total:</span>
-           <span>${(selectedProduct.price * sellQuantity).toFixed(2)}</span>
+           <span>{formatMoney(selectedProduct.price * sellQuantity)}</span>
          </div>
        </div>
 
@@ -749,6 +831,20 @@ const Inventory = () => {
    </div>
  </div>
 )}
+    {/* Botón de venta rápida */}
+    <QuickSaleButton
+      onScan={(barcode) => {
+        const product = products.find(p => p.barcode === barcode);
+        if (product) {
+          // Si el producto existe, abre el modal de venta
+          setSelectedProduct(product);
+          setSellQuantity(1);
+          setIsSellModalOpen(true);
+        } else {
+          toast.error("Producto no encontrado");
+        }
+      }}
+    />
     </div>
   );
 };

@@ -1,9 +1,11 @@
-// src\pages\admin\ServicesManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { NumericFormat } from 'react-number-format';
+import { FiEdit2, FiTrash2, FiClock, FiPlus, FiDollarSign } from 'react-icons/fi';
+import { CurrencyInput } from '../../components/common/MoneyInput';
 
 const ServicesManagement = () => {
   const { user } = useAuth();
@@ -53,7 +55,6 @@ const ServicesManagement = () => {
     }
 
     try {
-      // Validar datos
       if (!formData.name || !formData.price || !formData.duration) {
         toast.error("Por favor completa todos los campos requeridos");
         return;
@@ -72,7 +73,6 @@ const ServicesManagement = () => {
       };
 
       if (editingService) {
-        // Actualizar servicio existente
         const serviceRef = doc(db, "services", editingService.id);
         await updateDoc(serviceRef, {
           ...serviceData,
@@ -80,7 +80,6 @@ const ServicesManagement = () => {
         });
         toast.success("Servicio actualizado exitosamente");
       } else {
-        // Crear nuevo servicio
         await addDoc(collection(db, "services"), serviceData);
         toast.success("Servicio creado exitosamente");
       }
@@ -99,15 +98,15 @@ const ServicesManagement = () => {
     setEditingService(service);
     setFormData({
       name: service.name,
-      price: service.price.toString(),
+      price: service.price,
       duration: service.duration.toString(),
       description: service.description || ''
     });
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (serviceId) => {
-    if (window.confirm('¿Estás seguro de eliminar este servicio?')) {
+  const handleDelete = async (serviceId, serviceName) => {
+    if (window.confirm(`¿Estás seguro de eliminar el servicio "${serviceName}"?`)) {
       try {
         await deleteDoc(doc(db, "services", serviceId));
         toast.success("Servicio eliminado exitosamente");
@@ -132,7 +131,7 @@ const ServicesManagement = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestión de Servicios</h1>
-          <p className="text-gray-600">{user?.shopName}</p>
+          <p className="text-[#2c1810]">{user?.shopName}</p>
         </div>
         <button
           onClick={() => {
@@ -140,9 +139,9 @@ const ServicesManagement = () => {
             setFormData({ name: '', price: '', duration: '', description: '' });
             setIsModalOpen(true);
           }}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
         >
-          Nuevo Servicio
+          <FiPlus /> Nuevo Servicio
         </button>
       </div>
 
@@ -150,12 +149,13 @@ const ServicesManagement = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <FiPlus className="text-indigo-600" />
               {editingService ? 'Editar Servicio' : 'Nuevo Servicio'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-[#2c1810]">
                   Nombre del servicio *
                 </label>
                 <input
@@ -163,62 +163,68 @@ const ServicesManagement = () => {
                   name="name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]0"
                   required
+                  placeholder="Ej: Corte de cabello"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Precio ($) *
+                <label className="block text-sm font-medium text-[#2c1810]">
+                  Precio *
                 </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  required
-                  min="0"
-                  step="0.01"
-                />
+                <div className="mt-1 relative">
+                  <CurrencyInput
+                    value={formData.price}
+                    onValueChange={(value) => setFormData({...formData, price: value})}
+                    className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]0 pl-8"
+                    required
+                  />
+                  <FiDollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-[#2c1810]">
                   Duración (minutos) *
                 </label>
-                <input
-                  type="number"
-                  name="duration"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  required
-                  min="1"
-                />
+                <div className="mt-1 relative">
+                  <input
+                    type="number"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                    className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]0 pl-8"
+                    required
+                    min="1"
+                    placeholder="Ej: 30"
+                  />
+                  <FiClock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-[#2c1810]">
                   Descripción
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]0"
                   rows="3"
+                  placeholder="Descripción detallada del servicio..."
+                  
                 />
               </div>
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                  className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   {editingService ? 'Actualizar' : 'Crear'}
                 </button>
@@ -231,38 +237,59 @@ const ServicesManagement = () => {
       {/* Lista de Servicios */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {services.length === 0 ? (
-          <div className="col-span-full text-center text-gray-500 py-8">
-            No hay servicios registrados. Crea uno nuevo para empezar.
+          <div className="col-span-full text-center text-gray-500 py-8 bg-white rounded-lg shadow">
+            <FiPlus className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay servicios</h3>
+            <p className="mt-1 text-sm text-gray-500">Comienza creando un nuevo servicio.</p>
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingService(null);
+                  setFormData({ name: '', price: '', duration: '', description: '' });
+                  setIsModalOpen(true);
+                }}
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <FiPlus className="-ml-1 mr-2 h-5 w-5" />
+                Nuevo Servicio
+              </button>
+            </div>
           </div>
         ) : (
           services.map((service) => (
             <div
               key={service.id}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300"
             >
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold">{service.name}</h3>
+                  <h3 className="text-lg font-semibold text-[#2c1810]">{service.name}</h3>
                   <p className="text-lg font-bold text-indigo-600">
-                    ${service.price.toFixed(2)}
+                    {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(service.price)}
                   </p>
                 </div>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleEdit(service)}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                    title="Editar"
                   >
-                    Editar
+                    <FiEdit2 className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(service.id)}
-                    className="text-red-600 hover:text-red-800"
+                    onClick={() => handleDelete(service.id, service.name)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                    title="Eliminar"
                   >
-                    Eliminar
+                    <FiTrash2 className="w-5 h-5" />
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-gray-500">Duración: {service.duration} minutos</p>
+              <div className="flex items-center text-sm text-gray-500 mb-2">
+                <FiClock className="mr-1" />
+                <span>{service.duration} minutos</span>
+              </div>
               {service.description && (
                 <p className="text-sm text-gray-600 mt-2">{service.description}</p>
               )}
@@ -274,4 +301,4 @@ const ServicesManagement = () => {
   );
 };
 
-export default ServicesManagement;  
+export default ServicesManagement;
