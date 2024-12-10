@@ -1,40 +1,65 @@
-import React from 'react';
-import BarcodeScanner from './BarcodeScanner';
+// components/common/BarcodeScannerModal.jsx  
+import React, { useState } from 'react';  
+import { useZxing } from 'react-zxing';  
+import { FiX } from 'react-icons/fi';  
 
-const BarcodeScannerModal = ({ isOpen, onClose, onScan, title }) => {
-  if (!isOpen) return null;
+const BarcodeScannerModal = ({ isOpen, onClose, onScan, title }) => {  
+  if (!isOpen) return null;  
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+  const { ref } = useZxing({  
+    constraints: {  
+      video: {  
+        facingMode: "environment",  
+        width: { ideal: 1280 },  
+        height: { ideal: 720 }  
+      }  
+    },  
+    timeBetweenDecodingAttempts: 300,  
+    onDecodeResult(result) {  
+      const code = result.getText();  
+      console.log("Código detectado:", code);  
+      onScan(code);  
+    },  
+    onError(error) {  
+      console.error("Error del escáner:", error);  
+    },  
+  });  
 
-        <BarcodeScanner 
-          onResult={(result) => {
-            onScan(result);
-            onClose();
-          }}
-          onError={(error) => {
-            console.error("Error al escanear:", error);
-          }}
-        />
+  return (  
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]">  
+      <div className="bg-[#f8f5f0] rounded-lg p-4 w-full max-w-md relative">  
+        <button  
+          onClick={onClose}  
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 z-10"  
+        >  
+          <FiX className="w-6 h-6" />  
+        </button>  
 
-        <div className="mt-4 text-sm text-gray-500 text-center">
-          Apunta la cámara al código de barras para escanearlo
-        </div>
-      </div>
-    </div>
-  );
-};
+        <div className="mb-4 text-center">  
+          <h3 className="text-lg font-medium text-[#2c1810]">{title}</h3>  
+          <p className="text-sm text-gray-500">Apunta al código de barras</p>  
+        </div>  
 
-export default BarcodeScannerModal;
+        <div className="relative bg-black rounded-lg overflow-hidden">  
+          <video   
+            ref={ref}   
+            className="w-full h-64 object-cover"  
+          />  
+
+          {/* Guía visual para el escaneo */}  
+          <div className="absolute inset-0 pointer-events-none">  
+            <div className="absolute inset-x-[20%] top-[30%] bottom-[30%] border-2 border-yellow-500 border-opacity-50">  
+              <div className="absolute inset-0 border-2 border-yellow-500 animate-pulse"></div>  
+            </div>  
+          </div>  
+        </div>  
+
+        <div className="mt-4 text-center text-sm text-[#8b7355]">  
+          El código se detectará automáticamente  
+        </div>  
+      </div>  
+    </div>  
+  );  
+};  
+
+export default BarcodeScannerModal;  
