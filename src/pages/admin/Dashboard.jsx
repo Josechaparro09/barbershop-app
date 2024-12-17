@@ -115,75 +115,119 @@ const AdminDashboard = () => {
     }
   };
 
-  const ServiceList = ({ services, isPending }) => {
-    const tableHeaderClasses = `px-4 py-2 text-xs font-medium ${
-      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-    } uppercase tracking-wider`;
 
-    const tableCellClasses = `px-4 py-2 whitespace-nowrap ${
-      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-    }`;
-
-    return (
-      <div className={`rounded-lg shadow-lg overflow-hidden transition-colors duration-200 ${
-        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-      }`}>
-        <div className="px-6 py-4 border-b transition-colors duration-200 flex justify-between items-center">
-          <h3 className={`text-lg font-semibold transition-colors duration-200 ${
-            theme === 'dark' ? 'text-white' : 'text-gray-900'
-          }`}>
-            {isPending ? "Servicios Pendientes" : "Servicios Completados Recientes"}
-          </h3>
-          {isPending ? <Clock className="text-yellow-500" /> : <CheckCircle className="text-green-500" />}
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y transition-colors duration-200">
-            <thead className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-              <tr>
-                <th className={tableHeaderClasses + " text-left"}>Cliente</th>
-                <th className={tableHeaderClasses + " text-left"}>Barbero</th>
-                <th className={tableHeaderClasses + " text-left"}>Servicio</th>
-                <th className={tableHeaderClasses + " text-right"}>Precio</th>
-                <th className={tableHeaderClasses + " text-left"}>Fecha</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y transition-colors duration-200">
-              {services.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className={`${tableCellClasses} text-center py-8`}>
-                    No hay servicios {isPending ? "pendientes" : "completados"}.
-                  </td>
-                </tr>
-              ) : (
-                services.map((service) => (
-                  <tr key={service.id} className={`
-                    transition-colors duration-200
-                    ${theme === 'dark' 
-                      ? 'hover:bg-gray-700 even:bg-gray-800/50' 
-                      : 'hover:bg-gray-50 even:bg-gray-50/50'
-                    }
-                  `}>
-                    <td className={tableCellClasses}>{service.clientName}</td>
-                    <td className={tableCellClasses}>{service.barberName}</td>
-                    <td className={tableCellClasses}>{service.serviceName}</td>
-                    <td className={`${tableCellClasses} text-right font-medium ${
-                      theme === 'dark' ? 'text-green-400' : 'text-green-600'
-                    }`}>
-                      ${service.price?.toFixed(2)}
-                    </td>
-                    <td className={tableCellClasses}>
-                      {format(new Date(service.createdAt), "dd/MM/yyyy HH:mm", { locale: es })}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
+  const translatePaymentMethod = (method) => {
+    const methods = {
+      cash: 'Efectivo',
+      card: 'Tarjeta',
+      transfer: 'Transferencia'
+    };
+    return methods[method] || method;
   };
+  
+  const ServiceList = ({ services, isPending }) => (
+    <div className="bg-gray-800 rounded-lg shadow-xl p-4 sm:p-6 mt-6">
+      <h3 className="text-lg font-semibold mb-4 text-yellow-500">
+        {isPending ? "Servicios Pendientes" : "Servicios Completados Recientes"}
+      </h3>
+      
+      {/* Tabla para pantallas medianas y grandes */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-700">
+          <thead className="bg-gray-900">
+            <tr>
+              <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Cliente
+              </th>
+              <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Servicio
+              </th>
+              <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Barbero
+              </th>
+              <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Método de Pago
+              </th>
+              <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Precio
+              </th>
+              <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Fecha
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-gray-800 divide-y divide-gray-700">
+            {services.map((service) => (
+              <tr key={service.id} className="hover:bg-gray-700 transition-colors duration-150">
+                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-gray-300">{service.clientName}</td>
+                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-gray-300">{service.serviceName}</td>
+                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-gray-300">{service.barberName}</td>
+                <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                    ${service.paymentMethod === 'cash' ? 'bg-green-100 text-green-800' : 
+                      service.paymentMethod === 'card' ? 'bg-blue-100 text-blue-800' : 
+                      'bg-yellow-100 text-yellow-800'}`}>
+                    {translatePaymentMethod(service.paymentMethod)}
+                  </span>
+                </td>
+                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-yellow-500">${service.price?.toFixed(2)}</td>
+                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-gray-300">
+                  {format(new Date(service.createdAt), "dd/MM/yyyy HH:mm", {
+                    locale: es,
+                  })}
+                </td>
+              </tr>
+            ))}
+            {services.length === 0 && (
+              <tr>
+                <td colSpan="6" className="px-4 sm:px-6 py-4 text-center text-gray-400">
+                  No hay servicios {isPending ? "pendientes" : "completados"}.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+  
+      {/* Vista de tarjetas para móviles */}
+      <div className="md:hidden space-y-4">
+        {services.length === 0 ? (
+          <p className="text-center text-gray-400 py-4">
+            No hay servicios {isPending ? "pendientes" : "completados"}.
+          </p>
+        ) : (
+          services.map((service) => (
+            <div
+              key={service.id}
+              className="bg-gray-700 border border-gray-600 rounded-lg shadow-lg p-4 space-y-3"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-medium text-gray-200">{service.clientName}</p>
+                  <p className="text-sm text-gray-400">{service.serviceName}</p>
+                  <p className="text-sm text-gray-400">Barbero: {service.barberName}</p>
+                </div>
+                <p className="text-lg font-semibold text-yellow-500">
+                  ${service.price?.toFixed(2)}
+                </p>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                  ${service.paymentMethod === 'cash' ? 'bg-green-100 text-green-800' : 
+                    service.paymentMethod === 'card' ? 'bg-blue-100 text-blue-800' : 
+                    'bg-yellow-100 text-yellow-800'}`}>
+                  {translatePaymentMethod(service.paymentMethod)}
+                </span>
+                <span className="text-gray-400">
+                  {format(new Date(service.createdAt), "dd/MM/yyyy HH:mm", { locale: es })}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
