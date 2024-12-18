@@ -65,6 +65,19 @@ const Navbar = () => {
                  {link.text}
                </Link>
              ))}
+
+             {/* Theme Toggle */}
+             <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full text-white hover:bg-indigo-500 dark:hover:bg-gray-700 transition-colors"
+                title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </button>
              
              <div className="relative ml-4 flex items-center space-x-3">
                <button
