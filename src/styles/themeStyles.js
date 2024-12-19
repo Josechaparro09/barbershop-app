@@ -46,58 +46,72 @@ export const themeStyles = {
   
     // Tablas
     table: {
-      wrapper: "min-w-full divide-y divide-gray-200 dark:divide-gray-700",
-      header: "px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
-      row: "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200",
-      cell: "px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300",
+      // Contenedor principal
+      wrapper: "min-w-full divide-y divide-gray-200 dark:divide-gray-700 overflow-hidden",
+      container: "overflow-x-auto shadow-md sm:rounded-lg",
+      
+      // Estilos de la tabla
+      base: "min-w-full table-auto",
+      bordered: "border border-gray-200 dark:border-gray-700",
+      striped: "even:bg-gray-50 dark:even:bg-gray-700",
+      
+      // Encabezado
+      thead: "bg-gray-50 dark:bg-gray-700",
+      header: "px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider select-none",
+      headerCell: {
+        base: "px-6 py-3 text-left text-xs font-medium uppercase tracking-wider",
+        sortable: "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600",
+        sorted: "bg-gray-100 dark:bg-gray-600",
+      },
+      
+      // Cuerpo
+      tbody: "bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800",
+      row: {
+        base: "transition-colors duration-200",
+        default: "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
+        selected: "bg-yellow-50 dark:bg-yellow-900/20",
+        disabled: "opacity-50 cursor-not-allowed",
+      },
+      cell: {
+        base: "px-6 py-4 whitespace-nowrap text-sm",
+        default: "text-gray-900 dark:text-gray-300",
+        truncate: "max-w-xs truncate",
+        wrap: "whitespace-normal",
+        alignLeft: "text-left",
+        alignCenter: "text-center",
+        alignRight: "text-right",
+      },
+      
+      // Pie de tabla
+      tfoot: "bg-gray-50 dark:bg-gray-700",
       footer: "px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400",
-    },
-  
-    // Estados y Badges
-    status: {
-      success: "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400",
-      warning: "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400",
-      error: "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400",
-      info: "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400",
-    },
-  
-    // Modales y Overlays
-    modal: {
-      overlay: "fixed inset-0 bg-black bg-opacity-50 z-40",
-      container: "fixed inset-0 z-50 overflow-y-auto",
-      content: "flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0",
-      panel: "relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6",
-    },
-  
-    // Texto
-    text: {
-      title: "text-2xl font-bold text-gray-900 dark:text-white",
-      subtitle: "text-lg font-semibold text-gray-800 dark:text-gray-200",
-      body: "text-gray-700 dark:text-gray-300",
-      muted: "text-gray-500 dark:text-gray-400",
-    },
-  
-    // Loading States
-    loading: {
-      spinner: "animate-spin rounded-full border-b-2 border-gray-900 dark:border-white h-8 w-8",
-      wrapper: "flex justify-center items-center",
-      overlay: "absolute inset-0 bg-white/50 dark:bg-gray-900/50",
-    },
-  
-    // Dropdowns y Menús
-    dropdown: {
-      button: "inline-flex justify-between items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700",
-      container: "absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none",
-      item: "block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700",
-      divider: "border-t border-gray-200 dark:border-gray-700 my-1",
-    },
-  
-    // Utilidades
-    utils: {
-      divider: "border-t border-gray-200 dark:border-gray-700",
-      shadow: "shadow-lg",
-      rounded: "rounded-lg",
-      transition: "transition-all duration-200",
+      
+      // Estados especiales
+      empty: {
+        container: "text-center py-8",
+        text: "text-gray-500 dark:text-gray-400",
+      },
+      loading: {
+        overlay: "absolute inset-0 bg-white/50 dark:bg-gray-900/50",
+        spinner: "absolute inset-0 flex items-center justify-center",
+      },
+      
+      // Paginación
+      pagination: {
+        wrapper: "px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6",
+        button: {
+          base: "relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500",
+          enabled: "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600",
+          disabled: "bg-gray-100 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed",
+        },
+        text: "text-sm text-gray-700 dark:text-gray-300",
+      },
+      
+      // Utilidades
+      utils: {
+        sortIcon: "ml-2 w-4 h-4",
+        resizer: "absolute right-0 top-0 bottom-0 w-4 cursor-col-resize",
+      },
     },
     
     

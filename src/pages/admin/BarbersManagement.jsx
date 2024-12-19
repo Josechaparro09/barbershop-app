@@ -259,63 +259,72 @@ const BarbersManagement = () => {
       </div>
 
       <div className="hidden sm:block bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nombre
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Teléfono
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
+      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+          <thead className="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Nombre
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Teléfono
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Estado
+              </th>
+              <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+            {filteredBarbers.map((barber) => (
+              <tr key={barber.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
+                <td className="px-4 py-2 text-gray-900 dark:text-gray-300">{barber.name}</td>
+                <td className="px-4 py-2 text-gray-900 dark:text-gray-300">{barber.email}</td>
+                <td className="px-4 py-2 text-gray-900 dark:text-gray-300">{barber.phone}</td>
+                <td className="px-4 py-2">
+                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(barber.status)}`}>
+                    {translateStatus(barber.status)}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-right">
+                  <button 
+                    onClick={() => handleToggleActive(barber.id, barber.status)}
+                    className={`flex items-center ml-auto transition-colors duration-150 ${
+                      barber.status === 'active' 
+                        ? 'text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300' 
+                        : 'text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300'
+                    }`}
+                  >
+                    {barber.status === "active" ? (
+                      <>
+                        <FiXCircle className="mr-1" />
+                        <span>Desactivar</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiCheckCircle className="mr-1" />
+                        <span>Activar</span>
+                      </>
+                    )}
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredBarbers.map((barber) => (
-                <tr key={barber.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2">{barber.name}</td>
-                  <td className="px-4 py-2">{barber.email}</td>
-                  <td className="px-4 py-2">{barber.phone}</td>
-                  <td className="px-4 py-2">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(barber.status)}`}>
-                      {translateStatus(barber.status)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 text-right">
-                    <button 
-                      onClick={() => handleToggleActive(barber.id, barber.status)}
-                      className={`flex items-center ml-auto ${
-                        barber.status === 'active' ? 'text-red-500 hover:text-red-700' : 'text-green-500 hover:text-green-700'
-                      }`}
-                    >
-                      {barber.status === "active" ? (
-                        <>
-                          <FiXCircle className="mr-1" />
-                          <span>Desactivar</span>
-                        </>
-                      ) : (
-                        <>
-                          <FiCheckCircle className="mr-1" />
-                          <span>Activar</span>
-                        </>
-                      )}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+            {filteredBarbers.length === 0 && (
+              <tr>
+                <td colSpan="5" className="px-4 py-2 text-center text-gray-500 dark:text-gray-400">
+                  No se encontraron barberos.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       </div>
 
       {/* Modal de Registro de Barbero */}

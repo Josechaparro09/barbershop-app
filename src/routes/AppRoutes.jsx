@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminNewHaircut from '../pages/admin/AdminNewHaircut';
 
+import AppointmentsManagement from '../pages/admin/AppointmentsManagement';
+
 
 // Páginas públicas
 import Login from '../pages/Login';
@@ -22,7 +24,7 @@ import BarberDashboard from '../pages/barber/Dashboard';
 import NewHaircut from '../pages/barber/NewHaircut';
 import Profile from '../pages/barber/Profile';
 import Services from '../pages/barber/Services';
-
+import AppointmentBooking from '../pages/AppointmentBooking';
 // Componentes de layout
 import Layout from '../components/layout/Layout';
 
@@ -43,6 +45,7 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/appointments/book" element={<AppointmentBooking />} />
       </Routes>
     );
   }
@@ -67,6 +70,8 @@ const AppRoutes = () => {
             <Route path="/admin/inventory" element={<Inventory />} />
             <Route path="/admin/expenses" element={<Expenses />} />
             <Route path="/admin/new-haircut" element={<AdminNewHaircut />} />
+            <Route path="/admin/appointments" element={<AppointmentsManagement />} />
+            <Route path="/appointments/book" element={<AppointmentBooking />} />
           </>
         )}
 
