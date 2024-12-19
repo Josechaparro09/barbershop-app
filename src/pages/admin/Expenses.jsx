@@ -14,6 +14,7 @@ import {
   ArrowUpCircle,
   ArrowDownCircle
 } from 'lucide-react';
+import { CurrencyInput } from '../../components/common/MoneyInput';
 
 const Expenses = () => {
   const { user } = useAuth();
@@ -208,80 +209,159 @@ const Expenses = () => {
 
       {/* Lista de Gastos */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Descripción
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Categoría
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tipo
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Fecha
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Monto
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {expenses.map((expense) => (
-                <tr key={expense.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {expense.description}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {expense.createdByName}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <span className="mr-2">
-                        {categories.find(c => c.id === expense.category)?.icon}
-                      </span>
-                      <span className="text-sm text-gray-900">
-                        {categories.find(c => c.id === expense.category)?.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      expense.type === 'monthly' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-orange-100 text-orange-800'
-                    }`}>
-                      {expense.type === 'monthly' ? 'Mensual' : 'Inesperado'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(expense.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${expense.amount.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => handleDelete(expense.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Tabla para pantallas medianas y grandes */}
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-900">
+          <tr>
+            <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Descripción
+            </th>
+            <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Categoría
+            </th>
+            <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Tipo
+            </th>
+            <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Fecha
+            </th>
+            <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Monto
+            </th>
+            <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          {expenses.map((expense) => (
+            <tr key={expense.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <div className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                  {expense.description}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {expense.createdByName}
+                </div>
+              </td>
+              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <span className="mr-2 text-gray-500 dark:text-gray-400">
+                    {categories.find(c => c.id === expense.category)?.icon}
+                  </span>
+                  <span className="text-sm text-gray-900 dark:text-gray-300">
+                    {categories.find(c => c.id === expense.category)?.name}
+                  </span>
+                </div>
+              </td>
+              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                  expense.type === 'monthly'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                    : 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
+                }`}>
+                  {expense.type === 'monthly' ? 'Mensual' : 'Inesperado'}
+                </span>
+              </td>
+              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                {new Date(expense.date).toLocaleDateString()}
+              </td>
+              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300">
+                ${expense.amount.toFixed(2)}
+              </td>
+              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <button
+                  onClick={() => handleDelete(expense.id)}
+                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-150"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </td>
+            </tr>
+          ))}
+          {expenses.length === 0 && (
+            <tr>
+              <td colSpan="6" className="px-4 sm:px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                No hay gastos registrados.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+
+      {/* Vista mejorada de tarjetas para móviles */}
+      <div className="md:hidden space-y-4 p-4">
+        {expenses.map((expense) => (
+          <div
+            key={expense.id}
+            className="bg-white border border-gray-200 rounded-lg shadow-sm"
+          >
+            {/* Encabezado con monto y tipo */}
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-bold text-gray-900">
+                  ${expense.amount.toFixed(2)}
+                </span>
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                  expense.type === 'monthly' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-orange-100 text-orange-800'
+                }`}>
+                  {expense.type === 'monthly' ? 'Mensual' : 'Inesperado'}
+                </span>
+              </div>
+            </div>
+
+            {/* Cuerpo de la tarjeta */}
+            <div className="p-4 space-y-3">
+              {/* Descripción */}
+              <div className="text-base font-medium text-gray-900">
+                {expense.description}
+              </div>
+
+              {/* Categoría */}
+              <div className="flex items-center text-sm text-gray-600 bg-gray-50 rounded-md p-2">
+                <span className="mr-2">
+                  {categories.find(c => c.id === expense.category)?.icon}
+                </span>
+                <span>
+                  {categories.find(c => c.id === expense.category)?.name}
+                </span>
+              </div>
+
+              {/* Información adicional */}
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center text-sm text-gray-500">
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Calendar size={16} className="mr-1" />
+                  <span>{new Date(expense.date).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Pie de tarjeta con acción de eliminar */}
+            <div className="px-4 py-3 bg-gray-50 text-right border-t border-gray-100">
+              <button
+                onClick={() => handleDelete(expense.id)}
+                className="inline-flex items-center text-sm text-red-600 hover:text-red-800"
+              >
+                <Trash2 size={16} className="mr-1" />
+                <span>Eliminar</span>
+              </button>
+            </div>
+          </div>
+        ))}
+        
+        {expenses.length === 0 && (
+          <div className="text-center py-6">
+            <p className="text-gray-500">No hay gastos registrados.</p>
+          </div>
+        )}
       </div>
+    </div>
 
       {/* Modal de Nuevo Gasto */}
       {isModalOpen && (
@@ -293,7 +373,7 @@ const Expenses = () => {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="text-sm text-[#2c1810] mb-4 text-center border-b border-[#d4c3b5] pb-2">
                   Descripción *
                 </label>
                 <input
@@ -306,7 +386,7 @@ const Expenses = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="text-sm  text-[#2c1810] mb-4 text-center border-b border-[#d4c3b5] pb-2">
                   Categoría *
                 </label>
                 <select
@@ -324,11 +404,12 @@ const Expenses = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="text-sm  text-[#2c1810] mb-4 text-center border-b border-[#d4c3b5] pb-2">
                   Tipo de Gasto *
                 </label>
                 <div className="flex gap-4">
                   <label className="flex items-center">
+                    
                     <input
                       type="radio"
                       name="type"
@@ -337,7 +418,7 @@ const Expenses = () => {
                       onChange={(e) => setFormData({...formData, type: e.target.value})}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">Mensual</span>
+                    <span className="text-sm text-[#2c1810]">Mensual</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -348,13 +429,13 @@ const Expenses = () => {
                       onChange={(e) => setFormData({...formData, type: e.target.value})}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">Inesperado</span>
+                    <span className="text-sm text-[#2c1810]">Inesperado</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[#2c1810] mb-1">
                   Fecha *
                 </label>
                 <input
@@ -367,21 +448,17 @@ const Expenses = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[#2c1810] mb-1">
                   Monto ($) *
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                    <DollarSign size={16} />
-                  </span>
-                  <input
-                    type="number"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    required
-                    min="0"
-                    step="0.01"
+                <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-[#8b7355]">$</span>
+
+                  <CurrencyInput
+                  value={formData.amount}
+                  onValueChange={(value) => setFormData({...formData, amount: value})}
+                  className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]0 pl-8"
+                  required
                   />
                 </div>
               </div>

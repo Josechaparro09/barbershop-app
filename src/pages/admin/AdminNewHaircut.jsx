@@ -105,13 +105,13 @@ const AdminNewHaircut = () => {
       
       <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow-md rounded-lg p-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[#2c1810] mb-2">
             Seleccionar Servicio *
           </label>
           <select
             value={formData.serviceId}
             onChange={(e) => setFormData({...formData, serviceId: e.target.value})}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
             required
           >
             <option value="">Selecciona un servicio</option>
@@ -124,26 +124,26 @@ const AdminNewHaircut = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[#2c1810] mb-2">
             Nombre del Cliente *
           </label>
           <input
             type="text"
             value={formData.clientName}
             onChange={(e) => setFormData({...formData, clientName: e.target.value})}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]0"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[#2c1810] mb-2">
             Método de Pago
           </label>
           <select
             value={formData.paymentMethod}
             onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
           >
             <option value="cash">Efectivo</option>
             <option value="card">Tarjeta</option>
@@ -152,13 +152,13 @@ const AdminNewHaircut = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[#2c1810] mb-2">
             Notas
           </label>
           <textarea
             value={formData.notes}
             onChange={(e) => setFormData({...formData, notes: e.target.value})}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-[#d4c3b5] rounded focus:ring-1 focus:ring-[#6b4423] bg-[#f8f5f0]0"
             rows="3"
             placeholder="Notas adicionales..."
           />
