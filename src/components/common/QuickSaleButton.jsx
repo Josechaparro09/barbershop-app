@@ -1,3 +1,4 @@
+// src/components/common/QuickSaleButton.jsx
 import React, { useState } from 'react';
 import { FiCamera } from 'react-icons/fi';
 import QuickSaleScanner from './QuickSaleScanner';

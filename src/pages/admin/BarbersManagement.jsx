@@ -1,3 +1,4 @@
+// src/pages/admin/BarbersManagement.jsx
 // Importaciones en BarbersManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, updateDoc, doc, setDoc } from 'firebase/firestore';
