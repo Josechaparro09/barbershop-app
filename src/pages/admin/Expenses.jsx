@@ -1,3 +1,4 @@
+// src\pages\admin\Expenses.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';

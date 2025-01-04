@@ -1,3 +1,4 @@
+// src\pages\admin\servicesManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/config';
@@ -6,6 +7,8 @@ import { toast } from 'react-hot-toast';
 import { NumericFormat } from 'react-number-format';
 import { FiEdit2, FiTrash2, FiClock, FiPlus, FiDollarSign } from 'react-icons/fi';
 import { CurrencyInput } from '../../components/common/MoneyInput';
+import formatMoney from '../../utils/format';
+import { format } from 'date-fns';
 
 const ServicesManagement = () => {
   const { user } = useAuth();
@@ -266,7 +269,7 @@ const ServicesManagement = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-[#2c1810]">{service.name}</h3>
                   <p className="text-lg font-bold text-indigo-600">
-                    {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(service.price)}
+                    {formatMoney(service.price)}
                   </p>
                 </div>
                 <div className="flex space-x-2">

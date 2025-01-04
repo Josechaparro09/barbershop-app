@@ -1,3 +1,4 @@
+// src/components/common/MoneyInput.jsx
 import { NumericFormat } from 'react-number-format';
 
 export const CurrencyInput = ({ value, onValueChange, className, required = false, disabled = false }) => {

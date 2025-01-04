@@ -1,3 +1,4 @@
+// src/components/common/BarcodeScanner.jsx
 import React, { useState } from 'react';  
 import { useZxing } from 'react-zxing';  
 

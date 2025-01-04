@@ -17,6 +17,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import formatMoney from "../../utils/format";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -183,7 +184,7 @@ const AdminDashboard = () => {
                 </span>
               </td>
               <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-yellow-600 dark:text-yellow-500">
-                ${service.price?.toFixed(2)}
+                {formatMoney(service.price)}
               </td>
               <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                 {format(new Date(service.createdAt), "dd/MM/yyyy HH:mm", {
@@ -225,7 +226,7 @@ const AdminDashboard = () => {
                   <p className="text-sm text-gray-400">Barbero: {service.barberName}</p>
                 </div>
                 <p className="text-lg font-semibold text-yellow-500">
-                  ${service.price?.toFixed(2)}
+                  {formatMoney(service.price)}
                 </p>
               </div>
               <div className="flex items-center justify-between text-sm">
@@ -287,14 +288,14 @@ const AdminDashboard = () => {
             value: stats.todayServices,
             icon: Scissors,
             color: "green",
-            subtitle: `$${stats.todayEarnings.toFixed(2)}`
+            subtitle: `${formatMoney(stats.todayEarnings)}`
           },
           {
             title: "Servicios Mensuales",
             value: stats.monthlyServices,
             icon: Calendar,
             color: "purple",
-            subtitle: `$${stats.monthlyEarnings.toFixed(2)}`
+            subtitle: `${formatMoney(stats.monthlyEarnings)}`
           },
           {
             title: "Servicios Pendientes",
