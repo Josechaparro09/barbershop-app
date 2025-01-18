@@ -89,31 +89,7 @@ npm run dev
   </tr>
 </table>
 
-## 📝 Licencia
 
-Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE.md](LICENSE.md) para detalles
-
-## 📸 Capturas de Pantalla
-
-<table>
-  <tr>
-    <td align="center">
-      <img src="./screenshots/dashboard.png" alt="Dashboard" width="200"/>
-      <br />
-      <sub><b>Dashboard Principal</b></sub>
-    </td>
-    <td align="center">
-      <img src="./screenshots/inventory.png" alt="Inventario" width="200"/>
-      <br />
-      <sub><b>Gestión de Inventario</b></sub>
-    </td>
-    <td align="center">
-      <img src="./screenshots/services.png" alt="Servicios" width="200"/>
-      <br />
-      <sub><b>Registro de Servicios</b></sub>
-    </td>
-  </tr>
-</table>
 
 ## 🔗 Enlaces
 
