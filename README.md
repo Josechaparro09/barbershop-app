@@ -68,7 +68,7 @@ npm install
 npm run dev
 ```
 
-## 🤝 Colaboradores
+## 🤝 creadores
 
 <table>
   <tr>
