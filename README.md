@@ -6,6 +6,28 @@
 
 Sistema integral de gestión para barberías desarrollado con React y Firebase, diseñado para optimizar las operaciones diarias y mejorar la experiencia tanto de administradores como de barberos.
 
+## 📸 Capturas de Pantalla
+
+### Sistema de Citas
+| Agendar Cita | Gestión de Citas (Admin) |
+|--------------|-------------------------|
+| ![Agendar Cita](src/assets/images/screenshots/Agendar%20cita.jpeg) | ![Gestión de Citas](src/assets/images/screenshots/Gestion%20de%20citas%20admin.jpeg) |
+
+### Panel Administrativo
+| Dashboard Admin | Nuevo Servicio |
+|----------------|----------------|
+| ![Dashboard](src/assets/images/screenshots/Dashboard%20admin.jpeg) | ![Nuevo Servicio](src/assets/images/screenshots/Nuevo%20servicio%20admin.jpeg) |
+
+### Gestión Operativa
+| Gestión de Gastos | Gestión de Inventario | Gestión de Servicios |
+|-------------------|----------------------|---------------------|
+| ![Gastos](src/assets/images/screenshots/Gestion%20de%20gastos%20admin.jpeg) | ![Inventario](src/assets/images/screenshots/Gestion%20de%20inventario%20admin.jpeg) | ![Servicios](src/assets/images/screenshots/Gestion%20de%20servicios%20admin.jpeg) |
+
+### Gestión de Personal
+| Registrar Barbero |
+|-------------------|
+| ![Registro Barbero](src/assets/images/screenshots/Registrar%20barbero%20admin.jpeg) |
+
 ## ✨ Características Principales
 
 ### Para Administradores 👨‍💼
