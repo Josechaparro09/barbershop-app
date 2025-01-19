@@ -373,7 +373,7 @@ const Inventory = () => {
  {/* Grid compacto de estadísticas */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
    {/* Ventas Hoy */}
-   <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
+   <div className="bg-white border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
        <p className="text-[#6a3521] text-xs ">Ventas Hoy</p>
        <p className="text-xl font-bold text-[#6b4423]">{formatMoney(stats.todayTotal)}</p>
@@ -382,7 +382,7 @@ const Inventory = () => {
    </div>
 
    {/* Ventas Mes */}
-   <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
+   <div className="bg-white border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
        <p className="text-[#2c1810] text-xs ">Ventas Mes</p>
        <p className="text-xl font-bold text-[#6b4423]">{formatMoney(stats.monthTotal)}</p>
@@ -391,7 +391,7 @@ const Inventory = () => {
    </div>
 
    {/* Ganancias Hoy */}
-   <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
+   <div className="bg-white border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
        <p className="text-[#2c1810] text-xs ">Ganancias Hoy</p>
        <p className="text-xl font-bold text-[#3c7a3d]">{formatMoney(stats.todayEarnings)}</p>
@@ -399,7 +399,7 @@ const Inventory = () => {
    </div>
 
    {/* Ganancias Mes */}
-   <div className="bg-white border border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
+   <div className="bg-white border-[#d4c3b5] rounded-lg p-3 shadow hover:shadow-md transition-shadow">
      <div className="flex flex-col">
        <p className="text-[#2c1810] text-xs ">Ganancias Mes</p>
        <p className="text-xl font-bold text-[#3c7a3d]">{formatMoney(stats.monthEarnings)}</p>
@@ -409,7 +409,7 @@ const Inventory = () => {
 
  {/* Top Productos */}
  {stats.topProducts.length > 0 && (
-   <div className="bg-white border border-[#d4c3b5] rounded-lg p-4 shadow mt-4">
+   <div className="bg-white  border-[#d4c3b5] rounded-lg p-4 shadow mt-4">
      <h3 className="text-[#2c1810] text-sm  mb-2">Top Productos</h3>
      <div className="space-y-2">
        {stats.topProducts.map((product, index) => (
@@ -466,7 +466,7 @@ const Inventory = () => {
    filteredProducts.map((product) => (
      <div
        key={product.id}
-       className="bg-white border border-[#d4c3b5] rounded-lg p-4 shadow hover:shadow-md transition-all"
+       className="bg-white  border-[#d4c3b5] rounded-lg p-4 shadow hover:shadow-md transition-all"
      >
        <div className="flex justify-between items-start mb-2">
          <div>
@@ -486,7 +486,7 @@ const Inventory = () => {
          </div>
        </div>
 
-       <div className="space-y-1 mb-3 text-sm border-t border-[#d4c3b5] pt-2">
+       <div className="space-y-1 mb-3 text-sm border-t border-[#d4c3b5]   2">
          <div className="flex justify-between text-[#2c1810]">
            <span>Stock:</span>
            <span className={`font-medium ${
